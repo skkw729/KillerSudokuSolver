@@ -16,7 +16,7 @@ public class CageParser {
 			int total = line.nextInt();
 			Cage cage = new Cage(total);
 			String coordinate = line.next();//parse the coordinate
-			int row = Integer.parseInt(coordinate.substring(0,1));
+			int row = Integer.parseInt(coordinate.substring(0,1));//ignores the comma between the numbers
 			int column = Integer.parseInt(coordinate.substring(2));
 			cage.addCell(new Coordinate(row,column));
 			while(line.hasNext()){//add additional coordinates
