@@ -15,13 +15,13 @@ public class SudokuGrid {
 	private void initSudokuCells() {
 		for(int i=0;i<SIZE;i++){
 			for (int j=0;j<SIZE;j++){
-				grid[i][j] = new SudokuCell(new Coordinate(i+1,j+1));
+				grid[i][j] = new SudokuCell(new Location(i+1,j+1));
 			}
 		}
 		
 	}
-	public SudokuCell getCell(Coordinate coordinate){
-		return grid[coordinate.getRow()][coordinate.getColumn()];
+	public SudokuCell getCell(Location coordinate){
+		return grid[coordinate.getRow()-1][coordinate.getColumn()-1];
 	}
 	
 	public SudokuCell[][] getGrid(){
@@ -52,47 +52,36 @@ public class SudokuGrid {
 	}
 	public SudokuCell[] getNonet(int nonetNumber){
 		SudokuCell[] nonet = new SudokuCell[SIZE];
-		List<SudokuCell> cellsList = new ArrayList<>();
-		switch(nonetNumber){
-		case 1: cellsList.addAll(getCellsFromRow(1, 1, 3));
-				cellsList.addAll(getCellsFromRow(2, 1, 3));
-				cellsList.addAll(getCellsFromRow(3, 1, 3));
-				break;
-		case 2: cellsList.addAll(getCellsFromRow(1, 4, 6));
-				cellsList.addAll(getCellsFromRow(2, 4, 6));
-				cellsList.addAll(getCellsFromRow(3, 4, 6));
-				break;
-		case 3: cellsList.addAll(getCellsFromRow(4, 7, 9));
-				cellsList.addAll(getCellsFromRow(5, 7, 9));
-				cellsList.addAll(getCellsFromRow(6, 7, 9));
-				break;
-		case 4: cellsList.addAll(getCellsFromRow(4, 1, 3));
-				cellsList.addAll(getCellsFromRow(5, 1, 3));
-				cellsList.addAll(getCellsFromRow(6, 1, 3));
-				break;
-		case 5: cellsList.addAll(getCellsFromRow(4, 4, 6));
-				cellsList.addAll(getCellsFromRow(5, 4, 6));
-				cellsList.addAll(getCellsFromRow(6, 4, 6));
-				break;
-		case 6: cellsList.addAll(getCellsFromRow(4, 7, 9));
-				cellsList.addAll(getCellsFromRow(5, 7, 9));
-				cellsList.addAll(getCellsFromRow(6, 7, 9));
-				break;
-		case 7: cellsList.addAll(getCellsFromRow(7, 1, 3));
-				cellsList.addAll(getCellsFromRow(8, 1, 3));
-				cellsList.addAll(getCellsFromRow(9, 1, 3));
-				break;
-		case 8: cellsList.addAll(getCellsFromRow(7, 4, 6));
-				cellsList.addAll(getCellsFromRow(8, 4, 6));
-				cellsList.addAll(getCellsFromRow(9, 4, 6));
-				break;
-		case 9: cellsList.addAll(getCellsFromRow(7, 7, 9));
-				cellsList.addAll(getCellsFromRow(8, 7, 9));
-				cellsList.addAll(getCellsFromRow(9, 7, 9));
-				break;
+		List<SudokuCell> list = new ArrayList<>();
+		for(int i=0;i<SIZE;i++){
+			for(int j=0;j<SIZE;j++){
+				if(grid[i][j].getLocation().getNonet()==nonetNumber){
+					list.add(grid[i][j]);
+				}
+			}
 		}
-		nonet = (SudokuCell[]) cellsList.toArray();
-		return nonet;
+		return list.toArray(nonet);
+	}
+	public void printGrid(){
+		for(int i=0;i<9;i++){
+			SudokuCell[] row = getRow(i+1);
+			for(int j=0;j<row.length;j++){
+				System.out.print(row[j]+" ");
+			}
+			System.out.println("");
+		}
+	}
+	public void printNonets(){
+		for(int i=1;i<=9;i++){
+			SudokuCell[] nonet = getNonet(i);
+			System.out.println("Nonet "+i);
+			for(int j=0;j<nonet.length;j+=3){
+				
+				System.out.print(nonet[j]);
+				System.out.print(nonet[j+1]);
+				System.out.println(nonet[j+2]);
+			}
+		}
 	}
 }
 

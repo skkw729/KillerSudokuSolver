@@ -7,7 +7,8 @@ public class Main {
 		
 		List<Cage> cages = CageParser.parseCages("example1.txt");
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
-		System.out.println(grid.getCages());
-		
+		grid.printGrid();
+		grid.printNonets();
+
 	}
 }

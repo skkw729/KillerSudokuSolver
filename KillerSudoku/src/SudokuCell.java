@@ -3,12 +3,12 @@ import java.util.List;
 
 public class SudokuCell {
 	private int value;
-	private Coordinate location;
+	private Location location;
 	private boolean isSolved;
 	private List<Integer> possibleValues;
 	private static final int GAME_SIZE = 9;
 	
-	public SudokuCell(Coordinate location){
+	public SudokuCell(Location location){
 		value = 0;
 		this.location = location;
 		isSolved = false;
@@ -21,10 +21,10 @@ public class SudokuCell {
 	public void setValue(int value) {
 		this.value = value;
 	}
-	public Coordinate getLocation() {
+	public Location getLocation() {
 		return location;
 	}
-	public void setLocation(Coordinate location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
 	public boolean isSolved() {
@@ -41,11 +41,17 @@ public class SudokuCell {
 			possibleValues.add(i+1);
 		}
 	}
+	public void setPossibleValues(List<Integer> values){
+		possibleValues = values;
+	}
 	public void setImpossibleValue(int value){
 		if(value>0 && value<=GAME_SIZE){
 			if(possibleValues.contains(value)){
 				possibleValues.remove(value);
 			}
 		}
+	}
+	public String toString(){
+		return value+" "+location;
 	}
 }

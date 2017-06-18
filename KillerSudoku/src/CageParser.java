@@ -18,12 +18,12 @@ public class CageParser {
 			String coordinate = line.next();//parse the coordinate
 			int row = Integer.parseInt(coordinate.substring(0,1));//ignores the comma between the numbers
 			int column = Integer.parseInt(coordinate.substring(2));
-			cage.addCell(new Coordinate(row,column));
+			cage.addCell(new Location(row,column));
 			while(line.hasNext()){//add additional coordinates
 				coordinate = line.next();
 				row = Integer.parseInt(coordinate.substring(0,1));
 				column = Integer.parseInt(coordinate.substring(2));
-				cage.addCell(new Coordinate(row,column));
+				cage.addCell(new Location(row,column));
 			}
 			cages.add(cage);
 		}

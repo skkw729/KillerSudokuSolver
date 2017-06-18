@@ -1,13 +1,15 @@
 
-public class Coordinate {
+public class Location {
 	private int row;
 	private int column;
+	private int nonet;
 	
-	public Coordinate(int row, int column){
+	public Location(int row, int column){
 		if(row<1 || row>9) throw new IllegalArgumentException("Invalid row");
 		if(column<1 || column>9) throw new IllegalArgumentException("Invalid column");
 		this.row = row;
 		this.column = column;
+		initNonet();
 	}
 
 	public int getRow() {
@@ -27,8 +29,8 @@ public class Coordinate {
 	}
 	public boolean equals(Object obj){
 		if(this==obj) return true;
-		if(!(obj instanceof Coordinate)) return false;
-		Coordinate c = (Coordinate) obj;
+		if(!(obj instanceof Location)) return false;
+		Location c = (Location) obj;
 		if((c.getColumn()==column && c.getRow()==row)) return true;
 		return false;
 	}
@@ -40,5 +42,26 @@ public class Coordinate {
 	}
 	public String toString(){
 		return "("+row+","+column+")";
+	}
+
+	public int getNonet() {
+		return nonet;
+	}
+	private void initNonet(){
+		if(row<=3){
+			if(column<=3) nonet=1;
+			else if(column<=6) nonet=2;
+			else if(column<=9) nonet=3;
+		}
+		else if(row<=6){
+			if(column<=3) nonet=4;
+			else if(column<=6) nonet=5;
+			else if(column<=9) nonet=6;
+		}
+		else if(row<=9){
+			if(column<=3) nonet=7;
+			else if(column<=6) nonet=8;
+			else if(column<=9) nonet=9;
+		}
 	}
 }

@@ -17,7 +17,7 @@ public class KillerSudokuGrid extends SudokuGrid {
 	public List<Cage> getCages() {
 		return cages;
 	}
-	public Cage getCage(List<Coordinate> coordinates){
+	public Cage getCage(List<Location> coordinates){
 		for(Cage c:cages)
 		{
 			if(c.getCells().equals(coordinates)){
