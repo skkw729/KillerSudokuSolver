@@ -1,13 +1,17 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SudokuSolver {
 	private SudokuGrid grid;
 	private static final int SIZE = 9;
 	private boolean solved;
+	private Map<SudokuCell, Integer> hiddenSingleMap; 
 	public SudokuSolver(SudokuGrid grid){
 		this.grid = grid;
 		solved = false;
+		hiddenSingleMap = new HashMap<>();
 	}
 	public SudokuCell getSingleValueCell(){
 		
@@ -123,6 +127,7 @@ public class SudokuSolver {
 					if(!row[j].isSolved() && row[j].getPossibleValues().contains(number)){
 						if(isValidAtLocation(number,row[j].getLocation())){
 							cells.add(row[j]);
+							hiddenSingleMap.put(row[j],number);
 						}
 					}
 				}
@@ -132,6 +137,7 @@ public class SudokuSolver {
 			}
 			
 		}
+		hiddenSingleMap.clear();
 		return null;
 	}
 	public SudokuCell getHiddenSingleColumn(){
@@ -144,6 +150,7 @@ public class SudokuSolver {
 					if(!column[j].isSolved() && column[j].getPossibleValues().contains(number)){
 						if(isValidAtLocation(number,column[j].getLocation())){
 							cells.add(column[j]);
+							hiddenSingleMap.put(column[j],number);
 						}
 					}
 				}
@@ -153,6 +160,7 @@ public class SudokuSolver {
 			}
 			
 		}
+		hiddenSingleMap.clear();
 		return null;
 	}
 	public SudokuCell getHiddenSingleNonet(){
@@ -165,6 +173,7 @@ public class SudokuSolver {
 					if(!nonet[j].isSolved() && nonet[j].getPossibleValues().contains(number)){
 						if(isValidAtLocation(number,nonet[j].getLocation())){
 							cells.add(nonet[j]);
+							hiddenSingleMap.put(nonet[j],number);
 						}
 					}
 				}
@@ -174,14 +183,26 @@ public class SudokuSolver {
 			}
 			
 		}
+		hiddenSingleMap.clear();
 		return null;
 	}
-	public void solve(){
-		while(!solved){
+	private void solveHiddenSingle(SudokuCell cell){
+		int value = hiddenSingleMap.get(cell);
+		cell.setValue(value);
+		cell.setSolved(true);
+		
+		
+	}
+	public void solveOneCell(){
+		if(!solved){
 			List<SudokuCell> singleValueCells = getSingleValueCellList();
 			if(singleValueCells.size()>0){
 				SudokuCell cell = getSingleValueCell();
 				solveSingleValueCell(cell);
+			}
+			else if(getHiddenSingleRow()!=null){
+				SudokuCell cell = getHiddenSingleRow();
+				solveHiddenSingle(cell);
 			}
 			
 		}
