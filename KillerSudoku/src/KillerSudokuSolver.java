@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class KillerSudokuSolver {
 	private KillerSudokuGrid grid;
@@ -96,10 +97,10 @@ public class KillerSudokuSolver {
 		return solvableCellMap;
 	}
 	public boolean uniqueSum(Cage cage){
-		List<List<Integer>> combinations = new ArrayList<>();
 		int digits = cage.getLength();
 		int total = cage.getTotal();
-		
+		List<Set<Integer>> combinations = Sums.getSums(digits, total);
+		if(combinations.size()==1) return true;
 		
 		return false;
 	}
