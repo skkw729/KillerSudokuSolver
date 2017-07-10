@@ -96,9 +96,11 @@ public class KillerSudokuSolver {
 		return solvableCellMap;
 	}
 	public boolean uniqueSum(Cage cage){
-		List<Integer> sums = new ArrayList<>();
+		List<List<Integer>> combinations = new ArrayList<>();
 		int digits = cage.getLength();
 		int total = cage.getTotal();
+		
+		
 		return false;
 	}
 }
