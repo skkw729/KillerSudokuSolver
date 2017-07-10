@@ -8,13 +8,30 @@ public class KillerSudokuSolver {
 	private static final int SIZE = 9;
 	private boolean solved;
 	private SudokuSolver sudokuSolver;
-	
+
 	public KillerSudokuSolver(KillerSudokuGrid grid) {
 		this.grid = grid;
 		sudokuSolver = new SudokuSolver(grid);
+		solved = false;
 	}
-	
-	public List<SudokuCell> getCagesSpanningRegion(){
+
+	public KillerSudokuGrid getGrid() {
+		return grid;
+	}
+
+	public static int getSize() {
+		return SIZE;
+	}
+
+	public boolean isSolved() {
+		return solved;
+	}
+
+	public SudokuSolver getSudokuSolver() {
+		return sudokuSolver;
+	}
+
+	public Map<List<Cage>, Type> getCagesSpanningRegion(){
 		//rule of 45 - for each cage, check cell location
 		//check row, column and nonet
 		List<Cage> cages = grid.getCages();
@@ -50,17 +67,40 @@ public class KillerSudokuSolver {
 			nonetMap.put(i, cageNonetList);
 		}
 		//check length of cages in map
+		Map<List<Cage>, Type> solvableCellMap = new HashMap<>();
 		for(int i=1;i<=9;i++){
-		List<Cage> cageList = rowMap.get(i);
-		int span = 0;
-		for(Cage c : cageList){
-			span += c.getLength();
-		}
-		if(span == SIZE-1){}
+			List<Cage> cageListRow = rowMap.get(i);
+			List<Cage> cageListColumn = columnMap.get(i);
+			List<Cage> cageListNonet = nonetMap.get(i);
+			int span = 0;
+			for(Cage c : cageListRow){
+				span += c.getLength();
+			}
+			if(span == SIZE-1){
+				solvableCellMap.put(cageListRow,Type.ROW);
+			}
+			for(Cage c : cageListColumn){
+				span += c.getLength();
+			}
+			if(span == SIZE-1){
+				solvableCellMap.put(cageListColumn,Type.COLUMN);
+			}
+			for(Cage c : cageListNonet){
+				span += c.getLength();
+			}
+			if(span == SIZE-1){
+				solvableCellMap.put(cageListNonet,Type.NONET);
+			}
 		}
 		
-		return new ArrayList<>();
+		return solvableCellMap;
+	}
+	public boolean uniqueSum(Cage cage){
+		List<Integer> sums = new ArrayList<>();
+		int digits = cage.getLength();
+		int total = cage.getTotal();
+		return false;
 	}
 }
-		
+
 
