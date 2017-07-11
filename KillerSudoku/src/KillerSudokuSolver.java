@@ -96,13 +96,32 @@ public class KillerSudokuSolver {
 		
 		return solvableCellMap;
 	}
-	public boolean uniqueSum(Cage cage){
+	public boolean isUniqueSum(Cage cage){
 		int digits = cage.getLength();
 		int total = cage.getTotal();
 		List<Set<Integer>> combinations = Sums.getSums(digits, total);
 		if(combinations.size()==1) return true;
 		
 		return false;
+	}
+	
+	public List<Cage> getCageUniqueSum(){
+		List<Cage> cages = new ArrayList<>();
+		for(Cage c : grid.getCages()){
+			if(isUniqueSum(c)){
+				cages.add(c);
+			}
+		}
+		return cages;
+	}
+	
+	public void updateCageUniqueSum(){
+		//use knowledge of possible values to limit possible sums for each cage
+		for(Cage c : grid.getCages()){
+			if(!isUniqueSum(c)){
+				
+			}
+		}
 	}
 }
 
