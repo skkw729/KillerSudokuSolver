@@ -1,18 +1,19 @@
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class SudokuCell {
 	private int value;
 	private Location location;
 	private boolean isSolved;
-	private List<Integer> possibleValues;
+	private Set<Integer> possibleValues;
 	private static final int GAME_SIZE = 9;
 	
 	public SudokuCell(Location location){
 		value = 0;
 		this.location = location;
 		isSolved = false;
-		possibleValues = new ArrayList<>();
+		possibleValues = new TreeSet<>();
 		addPossibleValues();
 	}
 	public int getValue() {
@@ -33,7 +34,7 @@ public class SudokuCell {
 	public void setSolved(boolean isSolved) {
 		this.isSolved = isSolved;
 	}
-	public List<Integer> getPossibleValues() {
+	public Set<Integer> getPossibleValues() {
 		return possibleValues;
 	}
 	private void addPossibleValues() {
@@ -41,7 +42,7 @@ public class SudokuCell {
 			possibleValues.add(i+1);
 		}
 	}
-	public void setPossibleValues(List<Integer> values){
+	public void setPossibleValues(Set<Integer> values){
 		possibleValues = values;
 	}
 	public void setImpossibleValue(int value){

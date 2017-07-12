@@ -51,7 +51,8 @@ public class SudokuSolver {
 	}
 	public boolean solveSingleValueCell(SudokuCell cell){
 		if(cell.getPossibleValues().size()==1){
-			cell.setValue(cell.getPossibleValues().get(0));
+			int value = (int) cell.getPossibleValues().toArray()[0];
+			cell.setValue(value);
 			cell.setSolved(true);
 			System.out.println("Cell has a single possible value");
 			removeFromAllZones(cell);

@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class KillerSudokuSolver {
 	private KillerSudokuGrid grid;
@@ -44,7 +45,7 @@ public class KillerSudokuSolver {
 			List<Cage> cageColumnList = new ArrayList<>();
 			List<Cage> cageNonetList = new ArrayList<>();
 			for(Cage c : cages){
-				List<Location> locations = c.getCells();
+				List<Location> locations = c.getCellLocations();
 				boolean sameRow = true;
 				boolean sameColumn = true;
 				boolean sameNonet = true;
@@ -100,9 +101,7 @@ public class KillerSudokuSolver {
 		int digits = cage.getLength();
 		int total = cage.getTotal();
 		List<Set<Integer>> combinations = Sums.getSums(digits, total);
-		if(combinations.size()==1) return true;
-		
-		return false;
+		return (combinations.size()==1);
 	}
 	
 	public List<Cage> getCageUniqueSum(){
@@ -119,7 +118,13 @@ public class KillerSudokuSolver {
 		//use knowledge of possible values to limit possible sums for each cage
 		for(Cage c : grid.getCages()){
 			if(!isUniqueSum(c)){
-				
+				//for cages with previously non-unique sums, limit their possible values if applicable
+				Set<Integer> possibleNumbers = new TreeSet<>();
+				List<SudokuCell> cells = grid.getCells(c);
+				for(SudokuCell cell : cells){
+					possibleNumbers.addAll(cell.getPossibleValues());
+				}
+				List<Set<Integer>> combinations = Sums.getSums(c.getLength(), c.getTotal(), possibleNumbers);
 			}
 		}
 	}
