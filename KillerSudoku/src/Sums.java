@@ -4,12 +4,12 @@ public class Sums {
 	private static Set<Integer> NUMBERS = new TreeSet<>(LIST);
 	
 
-	public static List<Set<Integer>> getSums(int length, int total, Set<Integer> possibleNumbers){
-		List<Set<Integer>> solutions = new ArrayList<>();
+	public static List<Combination> getSums(int length, int total, Set<Integer> possibleNumbers){
+		List<Combination> solutions = new ArrayList<>();
 		getSumRecursively(length, total, possibleNumbers, new TreeSet<>(), solutions);
 		return solutions;
 	}
-	private static void getSumRecursively(int length, int total, Set<Integer> possibleNumbers, Set<Integer> numbersUsed, List<Set<Integer>> solutions){
+	private static void getSumRecursively(int length, int total, Set<Integer> possibleNumbers, Set<Integer> numbersUsed, List<Combination> solutions){
 		int lengthRemaining = length - numbersUsed.size();//iterations remaining
 		int current = 0;//current total of numbers used
 		if(numbersUsed.size()>0){
@@ -24,7 +24,8 @@ public class Sums {
 				for(Integer number : numbersUsed){
 					numbersUsedCopy.add(number);
 				}
-				if(!solutions.contains(numbersUsed)){solutions.add(numbersUsedCopy);}
+				Combination combination = new Combination(total,numbersUsedCopy);
+				if(!solutions.contains(combination)){solutions.add(combination);}//new combination
 			}
 			return;
 		}
@@ -49,7 +50,7 @@ public class Sums {
 			return;
 		}
 	}
-	public static List<Set<Integer>> getSums(int length, int total){
+	public static List<Combination> getSums(int length, int total){
 		return getSums(length, total, NUMBERS);
 	}
 }
