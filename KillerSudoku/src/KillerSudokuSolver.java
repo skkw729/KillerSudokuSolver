@@ -127,13 +127,14 @@ public class KillerSudokuSolver {
 				}
 				List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), possibleNumbers);
 				if(combinations.size()==1){
+					Combination uniqueCombination = combinations.get(0); 
 					for(Location l : c.getCellLocations()){
 						SudokuCell cell = grid.getCell(l);
 						//compare the possible values for this cell with the set of possible values for the cage
 						Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
 						for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
 						    int value = iterator.next();
-						    if (!combinations.get(0).getNumbers().contains(value)) {
+						    if (!uniqueCombination.contains(value)) {
 						        // Remove the current element from the iterator and the set.
 						        iterator.remove();
 						    }
