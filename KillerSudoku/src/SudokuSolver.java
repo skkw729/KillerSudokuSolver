@@ -53,7 +53,6 @@ public class SudokuSolver {
 		if(cell.getPossibleValues().size()==1){
 			int value = (int) cell.getPossibleValues().toArray()[0];
 			cell.setValue(value);
-			cell.setSolved(true);
 			System.out.println("Cell has a single possible value");
 			removeFromAllZones(cell);
 			System.out.println("Remove value as possible value from all rows, columns and nonets because a number can only appear once within a row, column or nonet.");
@@ -189,10 +188,7 @@ public class SudokuSolver {
 	}
 	private void solveHiddenSingle(SudokuCell cell){
 		int value = hiddenSingleMap.get(cell);
-		cell.setValue(value);
-		cell.setSolved(true);
-		
-		
+		cell.setValue(value);		
 	}
 	public void solveOneCell(){
 		if(!solved){

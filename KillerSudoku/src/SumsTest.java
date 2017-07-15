@@ -3,6 +3,6 @@ public class SumsTest{
 	public static void main(String[] args){
 		List<Integer> list = new ArrayList<>();
 		System.out.println(list.size());
-		System.out.println(Sums.getSums(6,39));
+		System.out.println(Sums.getSums(4,29));
 	}
 }

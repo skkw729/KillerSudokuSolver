@@ -20,6 +20,9 @@ public class SudokuCell {
 	}
 	public void setValue(int value) {
 		this.value = value;
+		possibleValues = new TreeSet<>();
+		possibleValues.add(value);
+		isSolved = true;
 	}
 	public Location getLocation() {
 		return location;
@@ -30,9 +33,9 @@ public class SudokuCell {
 	public boolean isSolved() {
 		return isSolved;
 	}
-	public void setSolved(boolean isSolved) {
-		this.isSolved = isSolved;
-	}
+//	public void setSolved(boolean isSolved) {
+//		this.isSolved = isSolved;
+//	}
 	public Set<Integer> getPossibleValues() {
 		return possibleValues;
 	}
