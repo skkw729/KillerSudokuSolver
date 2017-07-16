@@ -97,7 +97,7 @@ public class KillerSudokuSolver {
 				solvableCellMap.put(cageListNonet,Type.NONET);
 			}
 		}
-		
+
 		return solvableCellMap;
 	}
 	public boolean isUniqueSum(Cage cage){
@@ -106,7 +106,7 @@ public class KillerSudokuSolver {
 		List<Combination> combinations = Sums.getSums(digits, total);
 		return (combinations.size()==1);
 	}
-	
+
 	public List<Cage> getCageUniqueSum(){
 		List<Cage> cages = new ArrayList<>();
 		for(Cage c : grid.getCages()){
@@ -116,33 +116,30 @@ public class KillerSudokuSolver {
 		}
 		return cages;
 	}
-	
-	public void updateCageUniqueSum(){
-		//use knowledge of possible values to limit possible sums for each cage
+
+	public void updateCagePossibleValues(){
+		//use knowledge of sum combinations to limit possiblevalues for each cage
 		for(Cage c : grid.getCages()){
-			if(!isUniqueSum(c)){
-				//for cages with previously non-unique sums, limit their possible values if applicable
-				Set<Integer> possibleNumbers = new TreeSet<>();//possible values for the cage
-				List<SudokuCell> cells = grid.getCells(c);
-				for(SudokuCell cell : cells){
-					possibleNumbers.addAll(cell.getPossibleValues());
-				}
-				List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), possibleNumbers);
-				if(combinations.size()==1){
-					Combination uniqueCombination = combinations.get(0); 
-					for(Location l : c.getCellLocations()){
-						SudokuCell cell = grid.getCell(l);
-						//compare the possible values for this cell with the set of possible values for the cage
-						Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
-						for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
-						    int value = iterator.next();
-						    if (!uniqueCombination.contains(value)) {
-						        // Remove the current element from the iterator and the set.
-						        iterator.remove();
-						    }
+			Set<Integer> cagePossibleNumbers = new TreeSet<>();//possible values for the cage
+			List<SudokuCell> cells = grid.getCells(c);
+			for(SudokuCell cell : cells){
+				cagePossibleNumbers.addAll(cell.getPossibleValues());
+			}
+			List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), cagePossibleNumbers);
+			if(combinations.size()==1){
+				Combination uniqueCombination = combinations.get(0); 
+				for(Location l : c.getCellLocations()){
+					SudokuCell cell = grid.getCell(l);
+					//compare the possible values for this cell with the set of possible values for the cage
+					Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
+					for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
+						int value = iterator.next();
+						if (!uniqueCombination.contains(value)) {
+							// Remove the current element from the iterator and the set.
+							iterator.remove();
 						}
-						
 					}
+
 				}
 			}
 		}
