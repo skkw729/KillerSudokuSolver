@@ -82,12 +82,14 @@ public class KillerSudokuSolver {
 			if(span == SIZE-1){
 				solvableCellMap.put(cageListRow,Type.ROW);
 			}
+			span = 0;
 			for(Cage c : cageListColumn){
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
 				solvableCellMap.put(cageListColumn,Type.COLUMN);
 			}
+			span = 0;
 			for(Cage c : cageListNonet){
 				span += c.getLength();
 			}
