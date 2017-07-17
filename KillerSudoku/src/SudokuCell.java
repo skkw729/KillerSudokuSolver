@@ -18,6 +18,21 @@ public class SudokuCell {
 	public int getValue() {
 		return value;
 	}
+	/*
+	 * returns one possible value if there is only one value, else returns 0
+	 */
+	public int getSinglePossibleValue(){
+		int value = 0;
+		if(possibleValues.size()==1){
+			for(Integer i : possibleValues){
+				value = i;
+			}
+		}
+		return value;
+	}
+	public boolean hasSinglePossibleValue(){
+		return possibleValues.size()==1;
+	}
 	public void setValue(int value) {
 		this.value = value;
 		possibleValues = new TreeSet<>();

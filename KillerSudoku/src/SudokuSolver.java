@@ -53,43 +53,43 @@ public class SudokuSolver {
 		if(cell.getPossibleValues().size()==1){
 			int value = (int) cell.getPossibleValues().toArray()[0];
 			cell.setValue(value);
-			System.out.println("Cell has a single possible value");
+	//		System.out.println("Cell has a single possible value");
 			removeFromAllZones(cell);
-			System.out.println("Remove value as possible value from all rows, columns and nonets because a number can only appear once within a row, column or nonet.");
+	//		System.out.println("Remove value as possible value from all rows, columns and nonets because a number can only appear once within a row, column or nonet.");
 			return true;
 		}
 		return false;
 	}
-	private void removeFromAllZones(SudokuCell cell) {
+	public void removeFromAllZones(SudokuCell cell) {
 		removeSolvedValueFromRow(cell);
 		removeSolvedValueFromColumn(cell);
 		removeSolvedValueFromNonet(cell);
 	}
-	public void removeSolvedValueFromRow(SudokuCell cell){
+	private void removeSolvedValueFromRow(SudokuCell cell){
 		int value = cell.getValue();
 		Location location = cell.getLocation();
 		int row = location.getRow();
 		SudokuCell[] cells = grid.getRow(row);
 		for(int i=0;i<SIZE;i++){
-			cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
 		}
 	}
-	public void removeSolvedValueFromColumn(SudokuCell cell){
+	private void removeSolvedValueFromColumn(SudokuCell cell){
 		int value = cell.getValue();
 		Location location = cell.getLocation();
 		int column = location.getColumn();
 		SudokuCell[] cells = grid.getColumn(column);
 		for(int i=0;i<SIZE;i++){
-			cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
 		}
 	}
-	public void removeSolvedValueFromNonet(SudokuCell cell){
+	private void removeSolvedValueFromNonet(SudokuCell cell){
 		int value = cell.getValue();
 		Location location = cell.getLocation();
 		int nonet = location.getNonet();
 		SudokuCell[] cells = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
-			cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
 		}
 	}
 	public boolean isValidAtLocation(int value, Location location){
@@ -186,22 +186,22 @@ public class SudokuSolver {
 		hiddenSingleMap.clear();
 		return null;
 	}
-	private void solveHiddenSingle(SudokuCell cell){
+	public void solveHiddenSingle(SudokuCell cell){
 		int value = hiddenSingleMap.get(cell);
 		cell.setValue(value);		
 	}
-	public void solveOneCell(){
-		if(!solved){
-			List<SudokuCell> singleValueCells = getSingleValueCellList();
-			if(singleValueCells.size()>0){
-				SudokuCell cell = getSingleValueCell();
-				solveSingleValueCell(cell);
-			}
-			else if(getHiddenSingleRow()!=null){
-				SudokuCell cell = getHiddenSingleRow();
-				solveHiddenSingle(cell);
-			}
-			
-		}
-	}
+//	public void solveOneCell(){
+//		if(!solved){
+//			List<SudokuCell> singleValueCells = getSingleValueCellList();
+//			if(singleValueCells.size()>0){
+//				SudokuCell cell = getSingleValueCell();
+//				solveSingleValueCell(cell);
+//			}
+//			else if(getHiddenSingleRow()!=null){
+//				SudokuCell cell = getHiddenSingleRow();
+//				solveHiddenSingle(cell);
+//			}
+//			
+//		}
+//	}
 }

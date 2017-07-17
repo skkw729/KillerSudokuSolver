@@ -25,7 +25,7 @@ public class Cage {
 	public int getLength(){return locations.size();}
 	
 	public List<Location> getCellLocations(){return locations;}
-	
+		
 	public String toString(){
 		return total+" - "+locations;
 	}

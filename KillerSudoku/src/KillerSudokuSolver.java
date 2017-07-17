@@ -34,8 +34,9 @@ public class KillerSudokuSolver {
 	public SudokuSolver getSudokuSolver() {
 		return sudokuSolver;
 	}
-	public void solveCagesSpanningRegion(Map<List<Cage>, Region> cages){
+	public List<SudokuCell> solveCagesSpanningRegion(Map<List<Cage>, Region> cages){
 		Set<List<Cage>> cageList = cages.keySet();
+		List<SudokuCell> solvedCells = new ArrayList<>();
 		for(List<Cage> list : cageList){
 			//find the missing cell for the region
 			Region region = cages.get(list);
@@ -66,15 +67,15 @@ public class KillerSudokuSolver {
 			int cellValue = 45 - cageTotal;
 			int missingValue = 45 - rowColumnTotal;
 			if(type.equals(Type.ROW)){
-				//solve
 				missingCell = grid.getCell(Location.getInstance(regionNumber, missingValue));
 			}
 			else if(type.equals(Type.COLUMN)){
-				//solve
 				missingCell = grid.getCell(Location.getInstance(missingValue, regionNumber));
 			}
 			missingCell.setValue(cellValue);
+			solvedCells.add(missingCell);
 		}
+		return solvedCells;
 	}
 
 	public Map<List<Cage>, Region> getCagesSpanningRegion(){
@@ -144,56 +145,153 @@ public class KillerSudokuSolver {
 		return solvableCellMap;
 	}
 	public boolean isUniqueSum(Cage cage){
-		int digits = cage.getLength();
-		int total = cage.getTotal();
-		List<Combination> combinations = Sums.getSums(digits, total);
+		Set<Integer> cagePossibleNumbers = getPossibleValues(cage);
+		//list the possible combinations of numbers that sum to the cage
+		List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), cagePossibleNumbers);
 		return (combinations.size()==1);
 	}
 
 	public List<Cage> getCagesWithUniqueSum(){
 		List<Cage> cages = new ArrayList<>();
 		for(Cage c : grid.getCages()){
-			if(isUniqueSum(c)){
-				cages.add(c);
-			}
+			if(isUniqueSum(c)) cages.add(c);
 		}
 		return cages;
 	}
-
-	public void updateCagePossibleValues(){
-		//use knowledge of sum combinations to limit possiblevalues for each cage
-		for(Cage c : grid.getCages()){
-			Set<Integer> cagePossibleNumbers = new TreeSet<>();//possible values for the cage
-			List<SudokuCell> cells = grid.getCells(c);
-			//find all possible values for the cage
-			for(SudokuCell cell : cells){
-				cagePossibleNumbers.addAll(cell.getPossibleValues());
+	public List<SudokuCell> setPossibleValuesForUniqueCageSums(List<Cage> cages){
+		List<SudokuCell> cells = new ArrayList<>();
+		for(Cage cage : cages){
+			Set<Integer> possibleValues = getPossibleValues(cage);
+			Set<Integer> possibleSums = new TreeSet<>();
+			List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), possibleValues);
+			for(int i : combinations.get(0).getNumbers()){
+				possibleSums.add(i);
 			}
-			//calculate the possible numbers that sum to the cage
-			List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), cagePossibleNumbers);
-			Set<Integer> combinationNumbers = new TreeSet<>();
-			//list all numbers used in combinations 
-			for(Combination combination : combinations){
-				if(combinationNumbers.size()==SIZE) break;
-				for(int number : combination.getNumbers()){
-					if(!combinationNumbers.contains(number)) combinationNumbers.add(number);
-				}
-			}
-			//compare the cell's possible values with the set of combination numbers
-			for(Location l : c.getCellLocations()){
-				SudokuCell cell = grid.getCell(l);
-				//compare the possible values for this cell with the set of possible values for the cage
-				Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
-				for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
-					int value = iterator.next();
-					if (!combinationNumbers.contains(value)) {
-						// Remove the current element from the iterator and the set.
-						iterator.remove();
-					}
-				}
-
+			for(SudokuCell cell : grid.getCells(cage)){
+				cell.getPossibleValues().retainAll(possibleSums);
+				cells.add(cell);
 			}
 		}
+		return cells;
+	}
+	/*
+	 * used after solving a value in a cage
+	 */
+	public Map<SudokuCell, Integer> updateCage(SudokuCell solvedCell){
+		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
+		int value = solvedCell.getValue();
+		Cage cage = grid.getCage(solvedCell.getLocation());
+		int remaining = cage.getTotal();
+		removeFromAllRegions(solvedCell);
+		List<SudokuCell> cells = grid.getCells(cage);
+		List<SudokuCell> unsolvedCells = new ArrayList<>();
+
+		for(SudokuCell cell : cells){
+			if(cell.isSolved()){
+				remaining -= cell.getValue();
+			}
+			else if(!cell.isSolved()){
+				unsolvedCells.add(cell);
+			}
+		}
+		if(unsolvedCells.size()==1){
+			solvableCells.put(unsolvedCells.get(0), remaining);
+			return solvableCells;
+		}
+		List<Combination> combinations = Sums.getSums(unsolvedCells.size(), remaining, getPossibleValues(unsolvedCells));
+		//check if the remaining unsolved cells has a unique combination
+		if(combinations.size()==1){
+			Set<Integer> possibleValues = combinations.get(0).getNumbers();
+			for(SudokuCell cell : unsolvedCells){
+				cell.getPossibleValues().retainAll(possibleValues);
+				if(cell.hasSinglePossibleValue()) solvableCells.put(cell, cell.getSinglePossibleValue());
+			}
+		}
+
+		return solvableCells;
+	}
+	public List<SudokuCell> solveUpdatedCage(Map<SudokuCell, Integer> cageUpdate){
+		Set<SudokuCell> solvableCells = cageUpdate.keySet();
+		List<SudokuCell> solvedCells = new ArrayList<>();
+		for(SudokuCell c : solvableCells){
+			int value = cageUpdate.get(c);
+			c.setValue(value);
+			removeFromAllRegions(c);
+			solvedCells.add(c);
+		}
+		return solvedCells;
+	}
+	/*
+	 * updates possibleValue for cells in cages where combinations of sums can limit it
+	 */
+	//	public void updateCagePossibleValues(){
+	//		//use knowledge of sum combinations to limit possiblevalues for each cage
+	//		for(Cage c : grid.getCages()){
+	//			Set<Integer> cagePossibleNumbers = getPossibleValues(c);
+	//			//calculate the possible numbers that sum to the cage
+	//			List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), cagePossibleNumbers);
+	//			Set<Integer> combinationNumbers = new TreeSet<>();
+	//			//list all numbers used in combinations 
+	//			for(Combination combination : combinations){
+	//				if(combinationNumbers.size()!=SIZE){
+	//					for(int number : combination.getNumbers()){
+	//						if(!combinationNumbers.contains(number)) combinationNumbers.add(number);
+	//					}
+	//				}
+	//			}
+	//			//compare the cell's possible values with the set of combination numbers
+	//			for(Location l : c.getCellLocations()){
+	//				SudokuCell cell = grid.getCell(l);
+	//				//compare the possible values for this cell with the set of possible values for the cage
+	//				if(!cell.isSolved()){
+	//					cell.getPossibleValues().retainAll(cagePossibleNumbers);
+	//				}
+	//
+	//			}
+	//		}
+	//	}
+	public void solveSingleValueCells(){
+		for(SudokuCell cell :getSingleValueCellList()){
+			solveSingleValueCell(cell);
+		}
+	}
+	public Set<Integer> getPossibleValues(Cage cage){
+		Set<Integer> possibleValues = new TreeSet<>();
+		for(SudokuCell cell : grid.getCells(cage)){
+			possibleValues.addAll(cell.getPossibleValues());
+		}
+		return possibleValues;
+	}
+	public Set<Integer> getPossibleValues(List<SudokuCell> cells){
+		Set<Integer> possibleValues = new TreeSet<>();
+		for(SudokuCell cell : cells){
+			possibleValues.addAll(cell.getPossibleValues());
+		}
+		return possibleValues;
+	}
+	public List<SudokuCell> getSingleValueCellList(){
+		return sudokuSolver.getSingleValueCellList();
+	}
+	public boolean solveSingleValueCell(SudokuCell cell){
+		return sudokuSolver.solveSingleValueCell(cell);
+	}
+	public void removeFromAllRegions(SudokuCell cell) {
+		sudokuSolver.removeFromAllZones(cell);
+	}
+	public boolean isValidAtLocation(int value, Location location){
+		return sudokuSolver.isValidAtLocation(value, location);
+	}
+	public SudokuCell getHiddenSingleRow(){
+		return sudokuSolver.getHiddenSingleRow();
+	}
+	public SudokuCell getHiddenSingleColumn(){
+		return sudokuSolver.getHiddenSingleColumn();
+	}
+	public SudokuCell getHiddenSingleNonet(){
+		return sudokuSolver.getHiddenSingleNonet();
+	}
+	public void solveHiddenSingle(SudokuCell cell){
+		sudokuSolver.solveHiddenSingle(cell);
 	}
 }
 

@@ -12,6 +12,16 @@ public class KillerSudokuGrid extends SudokuGrid {
 		super();
 		this.setCages(cages);
 	}
+	public List<SudokuCell> getCells(){
+		List<SudokuCell> cells = new ArrayList<>();
+		for(int i=1;i<=9;i++){
+			for(int j=1;j<=9;j++){
+				SudokuCell c = super.getCell(Location.getInstance(i, j));
+				cells.add(c);
+			}
+		}
+		return cells;
+	}
 	public List<SudokuCell> getCells(Cage c){
 		
 		List<SudokuCell> list = new ArrayList<>();
@@ -26,7 +36,16 @@ public class KillerSudokuGrid extends SudokuGrid {
 	public Cage getCage(List<Location> coordinates){
 		for(Cage c:cages)
 		{
-			if(c.getCellLocations().equals(coordinates)){
+			if(c.getCellLocations().contains(coordinates)){
+				return c;
+			}
+		}
+		return null;
+	}
+	public Cage getCage(Location location){
+		for(Cage c:cages)
+		{
+			if(c.getCellLocations().contains(location)){
 				return c;
 			}
 		}
