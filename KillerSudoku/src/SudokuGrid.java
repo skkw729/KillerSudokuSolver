@@ -15,7 +15,7 @@ public class SudokuGrid {
 	private void initSudokuCells() {
 		for(int i=0;i<SIZE;i++){
 			for (int j=0;j<SIZE;j++){
-				grid[i][j] = new SudokuCell(new Location(i+1,j+1));
+				grid[i][j] = new SudokuCell(Location.getInstance(i+1,j+1));
 			}
 		}
 		

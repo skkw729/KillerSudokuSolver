@@ -35,14 +35,15 @@ public class KillerSudokuSolver {
 		return sudokuSolver;
 	}
 	public void solveCagesSpanningRegion(Map<List<Cage>, Region> cages){
-		Set<List<Cage>> keySet = cages.keySet();
-		for(List<Cage> list : keySet){
+		Set<List<Cage>> cageList = cages.keySet();
+		for(List<Cage> list : cageList){
 			//find the missing cell for the region
 			Region region = cages.get(list);
 			int regionNumber = region.getNumber();
 			Type type = region.getRegion();
 			int rowColumnTotal=0;
 			int cageTotal = 0;
+			SudokuCell missingCell=null;
 			for(Cage cage : list){
 				cageTotal += cage.getTotal();
 				for(Location location : cage.getCellLocations())
@@ -50,16 +51,29 @@ public class KillerSudokuSolver {
 					if(type.equals(Type.ROW)){
 						rowColumnTotal += location.getColumn();
 					}
-					if(type.equals(Type.COLUMN)){
+					else if(type.equals(Type.COLUMN)){
 						rowColumnTotal += location.getRow();
 					}
+					else if(type.equals(Type.NONET)){
+						List<SudokuCell> nonetCells = Arrays.asList(grid.getNonet(regionNumber));
+						SudokuCell cellAtLocation = grid.getCell(location);
+						if(!nonetCells.contains(cellAtLocation)){
+							missingCell = cellAtLocation;
+						}
+					}
 				}
-
 			}
+			int cellValue = 45 - cageTotal;
 			int missingValue = 45 - rowColumnTotal;
-			if(type.equals(Type.ROW)) //solve 
-			if(type.equals(Type.COLUMN)) //solve
-			if(type.equals(Type.NONET)); //solve
+			if(type.equals(Type.ROW)){
+				//solve
+				missingCell = grid.getCell(Location.getInstance(regionNumber, missingValue));
+			}
+			else if(type.equals(Type.COLUMN)){
+				//solve
+				missingCell = grid.getCell(Location.getInstance(missingValue, regionNumber));
+			}
+			missingCell.setValue(cellValue);
 		}
 	}
 
