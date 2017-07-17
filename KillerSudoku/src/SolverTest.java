@@ -7,6 +7,6 @@ public class SolverTest {
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
 //		System.out.println(solver.getCagesSpanningRegion());
-//		System.out.println(solver.getCageUniqueSum());
+//		System.out.println(solver.getCagesWithUniqueSum());
 		}
 }

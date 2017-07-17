@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,8 +34,36 @@ public class KillerSudokuSolver {
 	public SudokuSolver getSudokuSolver() {
 		return sudokuSolver;
 	}
+	public void solveCagesSpanningRegion(Map<List<Cage>, Region> cages){
+		Set<List<Cage>> keySet = cages.keySet();
+		for(List<Cage> list : keySet){
+			//find the missing cell for the region
+			Region region = cages.get(list);
+			int regionNumber = region.getNumber();
+			Type type = region.getRegion();
+			int rowColumnTotal=0;
+			int cageTotal = 0;
+			for(Cage cage : list){
+				cageTotal += cage.getTotal();
+				for(Location location : cage.getCellLocations())
+				{
+					if(type.equals(Type.ROW)){
+						rowColumnTotal += location.getColumn();
+					}
+					if(type.equals(Type.COLUMN)){
+						rowColumnTotal += location.getRow();
+					}
+				}
 
-	public Map<List<Cage>, Type> getCagesSpanningRegion(){
+			}
+			int missingValue = 45 - rowColumnTotal;
+			if(type.equals(Type.ROW)) //solve 
+			if(type.equals(Type.COLUMN)) //solve
+			if(type.equals(Type.NONET)); //solve
+		}
+	}
+
+	public Map<List<Cage>, Region> getCagesSpanningRegion(){
 		//rule of 45 - for each cage, check cell location
 		//check row, column and nonet
 		List<Cage> cages = grid.getCages();
@@ -70,7 +99,7 @@ public class KillerSudokuSolver {
 			nonetMap.put(i, cageNonetList);
 		}
 		//check length of cages in map
-		Map<List<Cage>, Type> solvableCellMap = new HashMap<>();
+		Map<List<Cage>, Region> solvableCellMap = new HashMap<>();
 		for(int i=1;i<=9;i++){
 			List<Cage> cageListRow = rowMap.get(i);
 			List<Cage> cageListColumn = columnMap.get(i);
@@ -80,21 +109,21 @@ public class KillerSudokuSolver {
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListRow,Type.ROW);
+				solvableCellMap.put(cageListRow,new Region(Type.ROW, i));
 			}
 			span = 0;
 			for(Cage c : cageListColumn){
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListColumn,Type.COLUMN);
+				solvableCellMap.put(cageListColumn,new Region(Type.COLUMN, i));
 			}
 			span = 0;
 			for(Cage c : cageListNonet){
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListNonet,Type.NONET);
+				solvableCellMap.put(cageListNonet,new Region(Type.NONET, i));
 			}
 		}
 
@@ -107,7 +136,7 @@ public class KillerSudokuSolver {
 		return (combinations.size()==1);
 	}
 
-	public List<Cage> getCageUniqueSum(){
+	public List<Cage> getCagesWithUniqueSum(){
 		List<Cage> cages = new ArrayList<>();
 		for(Cage c : grid.getCages()){
 			if(isUniqueSum(c)){
@@ -122,25 +151,33 @@ public class KillerSudokuSolver {
 		for(Cage c : grid.getCages()){
 			Set<Integer> cagePossibleNumbers = new TreeSet<>();//possible values for the cage
 			List<SudokuCell> cells = grid.getCells(c);
+			//find all possible values for the cage
 			for(SudokuCell cell : cells){
 				cagePossibleNumbers.addAll(cell.getPossibleValues());
 			}
+			//calculate the possible numbers that sum to the cage
 			List<Combination> combinations = Sums.getSums(c.getLength(), c.getTotal(), cagePossibleNumbers);
-			if(combinations.size()==1){
-				Combination uniqueCombination = combinations.get(0); 
-				for(Location l : c.getCellLocations()){
-					SudokuCell cell = grid.getCell(l);
-					//compare the possible values for this cell with the set of possible values for the cage
-					Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
-					for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
-						int value = iterator.next();
-						if (!uniqueCombination.contains(value)) {
-							// Remove the current element from the iterator and the set.
-							iterator.remove();
-						}
-					}
-
+			Set<Integer> combinationNumbers = new TreeSet<>();
+			//list all numbers used in combinations 
+			for(Combination combination : combinations){
+				if(combinationNumbers.size()==SIZE) break;
+				for(int number : combination.getNumbers()){
+					if(!combinationNumbers.contains(number)) combinationNumbers.add(number);
 				}
+			}
+			//compare the cell's possible values with the set of combination numbers
+			for(Location l : c.getCellLocations()){
+				SudokuCell cell = grid.getCell(l);
+				//compare the possible values for this cell with the set of possible values for the cage
+				Set<Integer> cellPossibleValues = cell.getPossibleValues();//possible values for the cell
+				for (Iterator<Integer> iterator = cellPossibleValues.iterator(); iterator.hasNext();) {
+					int value = iterator.next();
+					if (!combinationNumbers.contains(value)) {
+						// Remove the current element from the iterator and the set.
+						iterator.remove();
+					}
+				}
+
 			}
 		}
 	}
