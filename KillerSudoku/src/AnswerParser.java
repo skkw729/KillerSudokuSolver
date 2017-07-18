@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class AnswerParser {
@@ -19,5 +20,19 @@ public static SudokuGrid parseAnswer(String filename) throws FileNotFoundExcepti
 		}
 		return grid;
 		
+	}
+	public static boolean checkAnswer(SudokuGrid grid, SudokuGrid answer){
+		boolean result = true;
+		SudokuCell[][] array = grid.getGrid();
+		SudokuCell[][] otherArray = answer.getGrid();
+		for(int i=0; i<9; i++){
+			for(int j=0; j<9; j++){
+				if(array[i][j].isSolved()){
+					if(array[i][j].getValue()!=otherArray[i][j].getValue()) return false;
+				}
+			}
+			
+		}
+		return result;
 	}
 }

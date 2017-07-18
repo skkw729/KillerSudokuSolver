@@ -49,6 +49,7 @@ public class SolverTest {
 		
 		grid.printPossibleValues();
 		solver.solveSingleValueCells();
+		
 //		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
 //		for(Cage c : uniqueCages){
 //			solver.useSumsAsConstraints(c);
@@ -68,6 +69,7 @@ public class SolverTest {
 //		
 //		System.out.println(solver.getPartiallyFilledCages());
 		grid.printGrid();
+		System.out.println(AnswerParser.checkAnswer(grid, answer));
 //		grid.printGrid();
 	}
 }
