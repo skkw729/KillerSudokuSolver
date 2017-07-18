@@ -13,12 +13,10 @@ public class SolverTest {
 			Map<SudokuCell, Integer> cageUpdates = solver.updateCage(cell);
 			solver.solveUpdatedCage(cageUpdates);
 		}
-//		for(SudokuCell cell : grid.getCells()){
-//			if(cell.hasSinglePossibleValue()){
-//				System.out.println(cell.getLocation() + " value - "+cell.getSinglePossibleValue());
-//			}
-//			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
-//		}
+		for(SudokuCell cell : grid.getCells()){
+			
+			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
+		}
 		
 //		System.out.println(solver.getCagesSpanningRegion());
 //		System.out.println(solver.getCagesWithUniqueSum());
@@ -27,7 +25,7 @@ public class SolverTest {
 		solver.solveSingleValueCells();
 		System.out.println(solver.getSingleValueCellList());
 		solver.solveSingleValueCells();
-		System.out.println(solver.getSingleValueCellList());
+		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
 //		for(SudokuCell cell : solver.solveCagesSpanningRegion(solver.getCagesSpanningRegion())){
 //				solver.removeFromAllZones(cell);
 //		}

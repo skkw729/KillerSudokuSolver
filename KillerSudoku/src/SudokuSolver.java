@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SudokuSolver {
 	private SudokuGrid grid;
@@ -65,8 +66,25 @@ public class SudokuSolver {
 		removeSolvedValueFromColumn(cell);
 		removeSolvedValueFromNonet(cell);
 	}
+	public void removeFromRegion(Set<Integer> value, List<SudokuCell> cellsToIgnore, Type region){
+		for(int i : value){
+			if(region.equals(Type.ROW)){
+				removeFromRow(cellsToIgnore, i);
+			}
+			else if(region.equals(Type.COLUMN)){
+				removeFromColumn(cellsToIgnore, i);
+			}
+			else if(region.equals(Type.NONET)){
+				removeFromNonet(cellsToIgnore, i);
+			}
+		}
+	}
+	
 	private void removeSolvedValueFromRow(SudokuCell cell){
 		int value = cell.getValue();
+		removeFromRow(cell, value);
+	}
+	private void removeFromRow(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int row = location.getRow();
 		SudokuCell[] cells = grid.getRow(row);
@@ -74,8 +92,19 @@ public class SudokuSolver {
 			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
 		}
 	}
+	private void removeFromRow(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int row = location.getRow();
+		SudokuCell[] cellRow = grid.getRow(row);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellRow[i])) cellRow[i].setImpossibleValue(value);
+		}
+	}
 	private void removeSolvedValueFromColumn(SudokuCell cell){
 		int value = cell.getValue();
+		removeFromColumn(cell, value);
+	}
+	private void removeFromColumn(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int column = location.getColumn();
 		SudokuCell[] cells = grid.getColumn(column);
@@ -83,13 +112,32 @@ public class SudokuSolver {
 			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
 		}
 	}
+	private void removeFromColumn(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int column = location.getColumn();
+		SudokuCell[] cellColumn = grid.getColumn(column);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellColumn[i])) cellColumn[i].setImpossibleValue(value);
+		}
+	}
 	private void removeSolvedValueFromNonet(SudokuCell cell){
 		int value = cell.getValue();
+		removeFromNonet(cell, value);
+	}
+	private void removeFromNonet(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int nonet = location.getNonet();
 		SudokuCell[] cells = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
 			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
+		}
+	}
+	private void removeFromNonet(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int nonet = location.getNonet();
+		SudokuCell[] cellNonet = grid.getNonet(nonet);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellNonet[i])) cellNonet[i].setImpossibleValue(value);
 		}
 	}
 	public boolean isValidAtLocation(int value, Location location){

@@ -250,6 +250,24 @@ public class KillerSudokuSolver {
 	//			}
 	//		}
 	//	}
+	/*
+	 * use known unique sums contained in a region to limit possible values within
+	 */
+	public void useSumsAsConstraints(Cage c){
+		boolean sameRow = true;
+		boolean sameColumn = true;
+		boolean sameNonet = true;
+		int row = c.getCellLocations().get(0).getRow();
+		int col = c.getCellLocations().get(0).getColumn();
+		int nonet = c.getCellLocations().get(0).getNonet();
+		for(int i=1; i<c.getCellLocations().size();i++){
+			row = c.getCellLocations().get(i).getRow();
+			col = c.getCellLocations().get(i).getColumn();
+			nonet = c.getCellLocations().get(i).getNonet();
+			
+					
+		}
+	}
 	public void solveSingleValueCells(){
 		for(SudokuCell cell :getSingleValueCellList()){
 			solveSingleValueCell(cell);
