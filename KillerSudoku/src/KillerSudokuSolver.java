@@ -124,21 +124,21 @@ public class KillerSudokuSolver {
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListRow,new Region(Type.ROW, i));
+				solvableCellMap.put(cageListRow, Region.getInstance(Type.ROW, i));
 			}
 			span = 0;
 			for(Cage c : cageListColumn){
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListColumn,new Region(Type.COLUMN, i));
+				solvableCellMap.put(cageListColumn, Region.getInstance(Type.COLUMN, i));
 			}
 			span = 0;
 			for(Cage c : cageListNonet){
 				span += c.getLength();
 			}
 			if(span == SIZE-1){
-				solvableCellMap.put(cageListNonet,new Region(Type.NONET, i));
+				solvableCellMap.put(cageListNonet,Region.getInstance(Type.NONET, i));
 			}
 		}
 
@@ -150,7 +150,21 @@ public class KillerSudokuSolver {
 		List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), cagePossibleNumbers);
 		return (combinations.size()==1);
 	}
-
+	public List<Cage> getPartiallyFilledCages(){
+		List<Cage> partiallyFilledCages = new ArrayList<>();
+		for(Cage cage : grid.getCages()){
+			boolean partial = false;
+			for(SudokuCell cell : grid.getCells(cage)){
+				if(cell.isSolved()) {
+					for(SudokuCell cell2 : grid.getCells(cage)){
+						if(!cell.equals(cell2) && !cell2.isSolved()) partial = true; 
+					}
+				}
+			}
+			if(partial) partiallyFilledCages.add(cage);
+		}
+		return partiallyFilledCages;
+	}
 	public List<Cage> getCagesWithUniqueSum(){
 		List<Cage> cages = new ArrayList<>();
 		for(Cage c : grid.getCages()){
@@ -189,7 +203,6 @@ public class KillerSudokuSolver {
 	 */
 	public Map<SudokuCell, Integer> updateCage(SudokuCell solvedCell){
 		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
-		int value = solvedCell.getValue();
 		Cage cage = grid.getCage(solvedCell.getLocation());
 		int remaining = cage.getTotal();
 		removeFromAllRegions(solvedCell);
@@ -208,6 +221,40 @@ public class KillerSudokuSolver {
 			solvableCells.put(unsolvedCells.get(0), remaining);
 			return solvableCells;
 		}
+		List<Combination> combinations = Sums.getSums(unsolvedCells.size(), remaining, getPossibleValues(unsolvedCells));
+		//check if the remaining unsolved cells has a unique combination
+		if(combinations.size()==1){
+			Set<Integer> possibleValues = combinations.get(0).getNumbers();
+			for(SudokuCell cell : unsolvedCells){
+				cell.getPossibleValues().retainAll(possibleValues);
+				if(cell.hasSinglePossibleValue()) solvableCells.put(cell, cell.getSinglePossibleValue());
+			}
+		}
+
+		return solvableCells;
+	}
+	public Map<SudokuCell, Integer> updateCage(Cage cage){
+		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
+		int remaining = cage.getTotal();
+		
+		List<SudokuCell> cells = grid.getCells(cage);
+		List<SudokuCell> unsolvedCells = new ArrayList<>();
+		List<SudokuCell> solvedCells = new ArrayList<>();
+
+		for(SudokuCell cell : cells){
+			if(cell.isSolved()){
+				remaining -= cell.getValue();
+				solvedCells.add(cell);
+			}
+			else if(!cell.isSolved()){
+				unsolvedCells.add(cell);
+			}
+		}
+		if(unsolvedCells.size()==1){
+			solvableCells.put(unsolvedCells.get(0), remaining);
+			return solvableCells;
+		}
+		for(SudokuCell solvedCell : solvedCells){ removeFromAllRegions(solvedCell);}
 		List<Combination> combinations = Sums.getSums(unsolvedCells.size(), remaining, getPossibleValues(unsolvedCells));
 		//check if the remaining unsolved cells has a unique combination
 		if(combinations.size()==1){
@@ -261,14 +308,46 @@ public class KillerSudokuSolver {
 	//		}
 	//	}
 	/*
-	 * use known unique sums contained in a region to limit possible values within
+	 * cages completely contained within a region
 	 */
+	public Map<Region, List<Cage>> getRegionsContainingCages(){
+		Map<Region, List<Cage>> regionMap = new HashMap<>();
+		for(int i=1;i<=9;i++){
+			List<Cage> cageRowList = new ArrayList<>();
+			List<Cage> cageColumnList = new ArrayList<>();
+			List<Cage> cageNonetList = new ArrayList<>();
+			for(Cage c : grid.getCages()){
+				List<Location> locations = c.getCellLocations();
+				boolean sameRow = true;
+				boolean sameColumn = true;
+				boolean sameNonet = true;
+				for(Location l : locations){//check if all cells within a cage are in the same location
+					if(l.getRow()!=i) sameRow = false;
+					if(l.getColumn()!=i) sameColumn = false;
+					if(l.getNonet()!=i) sameNonet = false;
+				}
+				if(sameRow){
+					cageRowList.add(c);
+				}
+				if(sameColumn){
+					cageColumnList.add(c);
+				}
+				if(sameNonet){
+					cageNonetList.add(c);
+				}
+			}
+			regionMap.put(Region.getInstance(Type.ROW, i), cageRowList);
+			regionMap.put(Region.getInstance(Type.COLUMN, i), cageColumnList);
+			regionMap.put(Region.getInstance(Type.NONET, i), cageNonetList);
+		}
+		return regionMap;
+	}
 	public void useSumsAsConstraints(Cage c){
 		if(!isUniqueSum(c)) return;
 		Combination combination = Sums.getSums(c.getLength(), c.getTotal()).get(0);
-		boolean sameRow = true;
-		boolean sameColumn = true;
-		boolean sameNonet = true;
+		boolean sameRow = false;
+		boolean sameColumn = false;
+		boolean sameNonet = false;
 		int row = c.getCellLocations().get(0).getRow();
 		int col = c.getCellLocations().get(0).getColumn();
 		int nonet = c.getCellLocations().get(0).getNonet();

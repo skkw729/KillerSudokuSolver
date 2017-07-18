@@ -13,39 +13,40 @@ public class SolverTest {
 			Map<SudokuCell, Integer> cageUpdates = solver.updateCage(cell);
 			solver.solveUpdatedCage(cageUpdates);
 		}
-//		for(SudokuCell cell : grid.getCells()){
-//			
-//			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
-//		}
+		
+//		grid.printPossibleValues();
 		
 //		System.out.println(solver.getCagesSpanningRegion());
 //		System.out.println(solver.getCagesWithUniqueSum());
 		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
 		solver.solveSingleValueCells();
-		solver.solveSingleValueCells();
-		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
+//		solver.solveSingleValueCells();
+//		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
 		
 		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
-		for(Cage c : uniqueCages){
-			solver.useSumsAsConstraints(c);
-			solver.solveSingleValueCells();
-		}
-		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
-		for(Cage c : uniqueCages){
-			solver.useSumsAsConstraints(c);
-			solver.solveSingleValueCells();
-		}
-//		for(SudokuCell cell : solver.solveCagesSpanningRegion(solver.getCagesSpanningRegion())){
-//				solver.removeFromAllZones(cell);
+		Cage cage = uniqueCages.get(5);
+		solver.useSumsAsConstraints(cage);
+		grid.printPossibleValues();
+		solver.solveSingleValueCells();
+//		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
+//		for(Cage c : uniqueCages){
+//			solver.useSumsAsConstraints(c);
 //		}
+//		solver.solveSingleValueCells();
+//		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
+//		for(Cage c : uniqueCages){
+//			solver.useSumsAsConstraints(c);
+//			solver.solveSingleValueCells();
+//		}
+//		for(Cage cage : solver.getPartiallyFilledCages()){
+//			for(SudokuCell cell : grid.getCells(cage)){
+//				if(cell.isSolved()) solver.solveUpdatedCage(solver.updateCage(cell));
+//			}
+//			
+//		}
+//		
+//		System.out.println(solver.getPartiallyFilledCages());
 		grid.printGrid();
-//		System.out.println(grid.getCell(Location.getInstance(2, 9)).getPossibleValues());
-//		solver.updateCagePossibleValues();
-//		System.out.println(solver.getHiddenSingleColumn());
-//		System.out.println(solver.getHiddenSingleRow());
-//		System.out.println(solver.getHiddenSingleNonet());
-//		System.out.println(solver.getSingleValueCellList());
-//		System.out.println(solver.getCagesWithUniqueSum());
 //		grid.printGrid();
 	}
 }

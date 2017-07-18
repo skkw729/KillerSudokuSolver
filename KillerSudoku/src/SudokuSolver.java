@@ -43,7 +43,7 @@ public class SudokuSolver {
 		SudokuCell[][] cell = grid.getGrid();
 		for(int i=0;i<SIZE;i++){
 			for(int j=0;j<SIZE;j++){
-				if(cell[i][j].getPossibleValues().size()==1 && !cell[i][j].isSolved()){
+				if(cell[i][j].hasSinglePossibleValue() && !cell[i][j].isSolved()){
 					cellsList.add(cell[i][j]);
 				}
 			}
@@ -51,15 +51,15 @@ public class SudokuSolver {
 		return cellsList;
 	}
 	public boolean solveSingleValueCell(SudokuCell cell){
-		if(cell.getPossibleValues().size()==1){
-			int value = (int) cell.getPossibleValues().toArray()[0];
+		if(cell.hasSinglePossibleValue()){
+			int value = cell.getSinglePossibleValue();
 			cell.setValue(value);
 	//		System.out.println("Cell has a single possible value");
 			removeFromAllZones(cell);
 	//		System.out.println("Remove value as possible value from all rows, columns and nonets because a number can only appear once within a row, column or nonet.");
 			return true;
 		}
-		return false;
+		throw new IllegalStateException("single value cell was not solved");
 	}
 	public void removeFromAllZones(SudokuCell cell) {
 		removeSolvedValueFromRow(cell);
@@ -89,7 +89,7 @@ public class SudokuSolver {
 		int row = location.getRow();
 		SudokuCell[] cells = grid.getRow(row);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
 		}
 	}
 	private void removeFromRow(List<SudokuCell> cells, int value) {
@@ -97,7 +97,7 @@ public class SudokuSolver {
 		int row = location.getRow();
 		SudokuCell[] cellRow = grid.getRow(row);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellRow[i])) cellRow[i].setImpossibleValue(value);
+			if(!cells.contains(cellRow[i]) && !cellRow[i].isSolved()) cellRow[i].setImpossibleValue(value);
 		}
 	}
 	private void removeSolvedValueFromColumn(SudokuCell cell){
@@ -109,7 +109,7 @@ public class SudokuSolver {
 		int column = location.getColumn();
 		SudokuCell[] cells = grid.getColumn(column);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
 		}
 	}
 	private void removeFromColumn(List<SudokuCell> cells, int value) {
@@ -117,7 +117,7 @@ public class SudokuSolver {
 		int column = location.getColumn();
 		SudokuCell[] cellColumn = grid.getColumn(column);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellColumn[i])) cellColumn[i].setImpossibleValue(value);
+			if(!cells.contains(cellColumn[i]) && !cellColumn[i].isSolved()) cellColumn[i].setImpossibleValue(value);
 		}
 	}
 	private void removeSolvedValueFromNonet(SudokuCell cell){
@@ -129,7 +129,7 @@ public class SudokuSolver {
 		int nonet = location.getNonet();
 		SudokuCell[] cells = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell)) cells[i].setImpossibleValue(value);
+			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
 		}
 	}
 	private void removeFromNonet(List<SudokuCell> cells, int value) {
@@ -137,7 +137,7 @@ public class SudokuSolver {
 		int nonet = location.getNonet();
 		SudokuCell[] cellNonet = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellNonet[i])) cellNonet[i].setImpossibleValue(value);
+			if(!cells.contains(cellNonet[i]) && !cellNonet[i].isSolved()) cellNonet[i].setImpossibleValue(value);
 		}
 	}
 	public boolean isValidAtLocation(int value, Location location){

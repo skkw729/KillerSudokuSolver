@@ -1,10 +1,22 @@
+import java.util.HashMap;
+import java.util.Map;
 
 public class Region {
-	Type region;
-	int number;
-	public Region(Type type, int number){
+	private Type region;
+	private int number;
+	private static Map<String, Region> REGIONS = new HashMap<>();
+	private Region(Type type, int number){
 		region = type;
 		this.number = number;
+	}
+	public static Region getInstance(Type type, int number){
+		String s = type+" "+number;
+		Region r = REGIONS.get(s);
+		if(r==null){
+			r = new Region(type, number);
+			return r;
+		}
+		return r;
 	}
 	public Type getRegion() {
 		return region;

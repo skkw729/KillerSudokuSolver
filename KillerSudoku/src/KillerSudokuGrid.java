@@ -61,7 +61,12 @@ public class KillerSudokuGrid extends SudokuGrid {
 	public void removeCage(Cage cage){
 		if(cages.contains(cage)) cages.remove(cage);
 	}
-	
+	public void printPossibleValues(){
+		for(SudokuCell cell : getCells()){
+			
+			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
+		}
+	}
 	
 
 }
