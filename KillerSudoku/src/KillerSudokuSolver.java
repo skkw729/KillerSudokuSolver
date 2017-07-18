@@ -310,8 +310,8 @@ public class KillerSudokuSolver {
 	/*
 	 * cages completely contained within a region
 	 */
-	public Map<Region, List<Cage>> getRegionsContainingCages(){
-		Map<Region, List<Cage>> regionMap = new HashMap<>();
+	public Map<List<Cage>, Region> getRegionsContainingCages(){
+		Map<List<Cage>, Region> regionMap = new HashMap<>();
 		for(int i=1;i<=9;i++){
 			List<Cage> cageRowList = new ArrayList<>();
 			List<Cage> cageColumnList = new ArrayList<>();
@@ -336,29 +336,30 @@ public class KillerSudokuSolver {
 					cageNonetList.add(c);
 				}
 			}
-			regionMap.put(Region.getInstance(Type.ROW, i), cageRowList);
-			regionMap.put(Region.getInstance(Type.COLUMN, i), cageColumnList);
-			regionMap.put(Region.getInstance(Type.NONET, i), cageNonetList);
+			if(!cageRowList.isEmpty()) regionMap.put(cageRowList, Region.getInstance(Type.ROW, i));
+			if(!cageColumnList.isEmpty()) regionMap.put(cageColumnList, Region.getInstance(Type.COLUMN, i));
+			if(!cageNonetList.isEmpty()) regionMap.put(cageNonetList, Region.getInstance(Type.NONET, i));
 		}
 		return regionMap;
 	}
-	public void useSumsAsConstraints(Cage c){
-		if(!isUniqueSum(c)) return;
-		Combination combination = Sums.getSums(c.getLength(), c.getTotal()).get(0);
-		boolean sameRow = false;
-		boolean sameColumn = false;
-		boolean sameNonet = false;
-		int row = c.getCellLocations().get(0).getRow();
-		int col = c.getCellLocations().get(0).getColumn();
-		int nonet = c.getCellLocations().get(0).getNonet();
-		for(Location l : c.getCellLocations()){
-			if(l.getRow()!=row){ sameRow=false;}
-			if(l.getColumn()!=col){ sameColumn=false;}	
-			if(l.getNonet()!=nonet){ sameNonet=false;}
+	/*
+	 * checks if a cage is fully solved
+	 */
+	public boolean isSolved(Cage c){
+		for(SudokuCell cell : grid.getCells(c)){
+			if(!cell.isSolved()) return false;
 		}
-		if(sameRow) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.ROW);
-		if(sameColumn) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.COLUMN);
-		if(sameNonet) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.NONET);
+		return true;
+	}
+	public void useSumsAsConstraints(Cage cage, Region region){
+		if(!isUniqueSum(cage)) return;
+		if(isSolved(cage)) return;
+		Set<Integer> cagePossibleNumbers = getPossibleValues(cage);
+		List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), cagePossibleNumbers);
+		Combination combination = combinations.get(0);
+		Set<Integer> numbers = combination.getNumbers();
+		sudokuSolver.removeFromRegion(numbers, grid.getCells(cage), region);
+		
 	}
 	public void solveSingleValueCells(){
 		for(SudokuCell cell :getSingleValueCellList()){

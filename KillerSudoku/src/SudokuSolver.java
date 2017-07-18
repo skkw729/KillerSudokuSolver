@@ -66,15 +66,15 @@ public class SudokuSolver {
 		removeSolvedValueFromColumn(cell);
 		removeSolvedValueFromNonet(cell);
 	}
-	public void removeFromRegion(Set<Integer> value, List<SudokuCell> cellsToIgnore, Type region){
+	public void removeFromRegion(Set<Integer> value, List<SudokuCell> cellsToIgnore, Region region){
 		for(int i : value){
-			if(region.equals(Type.ROW)){
+			if(region.getRegion().equals(Type.ROW)){
 				removeFromRow(cellsToIgnore, i);
 			}
-			else if(region.equals(Type.COLUMN)){
+			else if(region.getRegion().equals(Type.COLUMN)){
 				removeFromColumn(cellsToIgnore, i);
 			}
-			else if(region.equals(Type.NONET)){
+			else if(region.getRegion().equals(Type.NONET)){
 				removeFromNonet(cellsToIgnore, i);
 			}
 		}

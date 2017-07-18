@@ -1,10 +1,13 @@
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SolverTest {
 	public static void main(String[] args) throws FileNotFoundException{
 		List<Cage> cages = CageParser.parseCages("example1.txt");
+		SudokuGrid answer = AnswerParser.parseAnswer("example1Answer.txt");
+		answer.printGrid();
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
 //		solver.updateCagePossibleValues();
@@ -23,9 +26,27 @@ public class SolverTest {
 //		solver.solveSingleValueCells();
 //		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
 		
-		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
-		Cage cage = uniqueCages.get(5);
-		solver.useSumsAsConstraints(cage);
+		//List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
+		Map<List<Cage>, Region> map = solver.getRegionsContainingCages();
+		Set<List<Cage>> keySet = map.keySet();
+		for(List<Cage> c: keySet){
+			Region r = map.get(c);
+			for(Cage cage : c){
+			solver.useSumsAsConstraints(cage, r);
+			}
+		}
+		
+		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
+		solver.solveSingleValueCells();
+		map = solver.getRegionsContainingCages();
+		keySet = map.keySet();
+		for(List<Cage> c: keySet){
+			Region r = map.get(c);
+			for(Cage cage : c){
+			solver.useSumsAsConstraints(cage, r);
+			}
+		}
+		
 		grid.printPossibleValues();
 		solver.solveSingleValueCells();
 //		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
