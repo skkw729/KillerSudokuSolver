@@ -156,6 +156,16 @@ public class KillerSudokuSolver {
 		for(Cage c : grid.getCages()){
 			if(isUniqueSum(c)) cages.add(c);
 		}
+		//remove solved cages
+		List<Cage> solvedCages = new ArrayList<>();
+		for(Cage cage : cages){
+			boolean solved = true;
+			for(SudokuCell cell : grid.getCells(cage)){
+				if(!cell.isSolved()) solved = false;
+			}
+			if(solved) solvedCages.add(cage); 
+		}
+		solvedCages.removeAll(solvedCages);
 		return cages;
 	}
 	public List<SudokuCell> setPossibleValuesForUniqueCageSums(List<Cage> cages){
