@@ -13,19 +13,28 @@ public class SolverTest {
 			Map<SudokuCell, Integer> cageUpdates = solver.updateCage(cell);
 			solver.solveUpdatedCage(cageUpdates);
 		}
-		for(SudokuCell cell : grid.getCells()){
-			
-			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
-		}
+//		for(SudokuCell cell : grid.getCells()){
+//			
+//			System.out.println(cell.getLocation()+" "+cell.getPossibleValues());
+//		}
 		
 //		System.out.println(solver.getCagesSpanningRegion());
 //		System.out.println(solver.getCagesWithUniqueSum());
 		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
-		System.out.println(solver.getSingleValueCellList());
 		solver.solveSingleValueCells();
-		System.out.println(solver.getSingleValueCellList());
 		solver.solveSingleValueCells();
 		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
+		
+		List<Cage> uniqueCages = solver.getCagesWithUniqueSum();
+		for(Cage c : uniqueCages){
+			solver.useSumsAsConstraints(c);
+			solver.solveSingleValueCells();
+		}
+		solver.setPossibleValuesForUniqueCageSums(solver.getCagesWithUniqueSum());
+		for(Cage c : uniqueCages){
+			solver.useSumsAsConstraints(c);
+			solver.solveSingleValueCells();
+		}
 //		for(SudokuCell cell : solver.solveCagesSpanningRegion(solver.getCagesSpanningRegion())){
 //				solver.removeFromAllZones(cell);
 //		}

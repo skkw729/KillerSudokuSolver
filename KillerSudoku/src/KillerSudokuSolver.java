@@ -254,19 +254,22 @@ public class KillerSudokuSolver {
 	 * use known unique sums contained in a region to limit possible values within
 	 */
 	public void useSumsAsConstraints(Cage c){
+		if(!isUniqueSum(c)) return;
+		Combination combination = Sums.getSums(c.getLength(), c.getTotal()).get(0);
 		boolean sameRow = true;
 		boolean sameColumn = true;
 		boolean sameNonet = true;
 		int row = c.getCellLocations().get(0).getRow();
 		int col = c.getCellLocations().get(0).getColumn();
 		int nonet = c.getCellLocations().get(0).getNonet();
-		for(int i=1; i<c.getCellLocations().size();i++){
-			row = c.getCellLocations().get(i).getRow();
-			col = c.getCellLocations().get(i).getColumn();
-			nonet = c.getCellLocations().get(i).getNonet();
-			
-					
+		for(Location l : c.getCellLocations()){
+			if(l.getRow()!=row){ sameRow=false;}
+			if(l.getColumn()!=col){ sameColumn=false;}	
+			if(l.getNonet()!=nonet){ sameNonet=false;}
 		}
+		if(sameRow) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.ROW);
+		if(sameColumn) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.COLUMN);
+		if(sameNonet) sudokuSolver.removeFromRegion(combination.getNumbers(), grid.getCells(c), Type.NONET);
 	}
 	public void solveSingleValueCells(){
 		for(SudokuCell cell :getSingleValueCellList()){
