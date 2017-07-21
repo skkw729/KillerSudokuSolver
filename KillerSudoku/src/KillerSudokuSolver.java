@@ -199,7 +199,7 @@ public class KillerSudokuSolver {
 		return cells;
 	}
 	/*
-	 * used after solving a value in a cage
+	 * used after solving a value in a cage on partially filled cages
 	 */
 	public Map<SudokuCell, Integer> updateCage(SudokuCell solvedCell){
 		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
@@ -233,6 +233,16 @@ public class KillerSudokuSolver {
 
 		return solvableCells;
 	}
+	public Map<SudokuCell, Integer> updateCage(List<Cage> cages){
+		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
+		for(Cage cage : cages){
+			solvableCells.putAll(updateCage(cage));
+		}
+		return solvableCells;
+	}
+	/*
+	 * used after solving a value in a cage on partially filled cages
+	 */
 	public Map<SudokuCell, Integer> updateCage(Cage cage){
 		Map<SudokuCell, Integer> solvableCells = new HashMap<>();
 		int remaining = cage.getTotal();

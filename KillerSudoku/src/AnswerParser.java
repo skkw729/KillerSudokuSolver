@@ -28,10 +28,19 @@ public static SudokuGrid parseAnswer(String filename) throws FileNotFoundExcepti
 		for(int i=0; i<9; i++){
 			for(int j=0; j<9; j++){
 				if(array[i][j].isSolved()){
-					if(array[i][j].getValue()!=otherArray[i][j].getValue()) return false;
+					if(array[i][j].getValue()!=otherArray[i][j].getValue()) result = false;
 				}
 			}
 			
+		}
+		if(!result){
+			for(int i=0; i<9;i++){
+				for(int j=0;j<9;j++){
+					if(array[i][j].getValue()!=otherArray[i][j].getValue()){
+						System.out.println("Incorrect value"+array[i][j].getValue() +" at "+array[i][j].getLocation()+" expected value: "+otherArray[i][j].getValue());
+					}
+				}
+			}
 		}
 		return result;
 	}
