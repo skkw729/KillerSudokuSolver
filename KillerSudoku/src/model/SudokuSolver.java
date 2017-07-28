@@ -1,3 +1,4 @@
+package model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,17 +88,17 @@ public class SudokuSolver {
 	private void removeFromRow(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int row = location.getRow();
-		SudokuCell[] cells = grid.getRow(row);
+		List<SudokuCell> cells = grid.getRow(row);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
 		}
 	}
 	private void removeFromRow(List<SudokuCell> cells, int value) {
 		Location location = cells.get(0).getLocation();
 		int row = location.getRow();
-		SudokuCell[] cellRow = grid.getRow(row);
+		List<SudokuCell> cellRow = grid.getRow(row);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellRow[i]) && !cellRow[i].isSolved()) cellRow[i].setImpossibleValue(value);
+			if(!cells.contains(cellRow.get(i)) && !cellRow.get(i).isSolved()) cellRow.get(i).setImpossibleValue(value);
 		}
 	}
 	private void removeSolvedValueFromColumn(SudokuCell cell){
@@ -107,17 +108,17 @@ public class SudokuSolver {
 	private void removeFromColumn(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int column = location.getColumn();
-		SudokuCell[] cells = grid.getColumn(column);
+		List<SudokuCell> cells = grid.getColumn(column);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
 		}
 	}
 	private void removeFromColumn(List<SudokuCell> cells, int value) {
 		Location location = cells.get(0).getLocation();
 		int column = location.getColumn();
-		SudokuCell[] cellColumn = grid.getColumn(column);
+		List<SudokuCell> cellColumn = grid.getColumn(column);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellColumn[i]) && !cellColumn[i].isSolved()) cellColumn[i].setImpossibleValue(value);
+			if(!cells.contains(cellColumn.get(i)) && !cellColumn.get(i).isSolved()) cellColumn.get(i).setImpossibleValue(value);
 		}
 	}
 	private void removeSolvedValueFromNonet(SudokuCell cell){
@@ -127,38 +128,38 @@ public class SudokuSolver {
 	private void removeFromNonet(SudokuCell cell, int value) {
 		Location location = cell.getLocation();
 		int nonet = location.getNonet();
-		SudokuCell[] cells = grid.getNonet(nonet);
+		List<SudokuCell> cells = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
-			if(!cells[i].equals(cell) && !cells[i].isSolved()) cells[i].setImpossibleValue(value);
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
 		}
 	}
 	private void removeFromNonet(List<SudokuCell> cells, int value) {
 		Location location = cells.get(0).getLocation();
 		int nonet = location.getNonet();
-		SudokuCell[] cellNonet = grid.getNonet(nonet);
+		List<SudokuCell> cellNonet = grid.getNonet(nonet);
 		for(int i=0;i<SIZE;i++){
-			if(!cells.contains(cellNonet[i]) && !cellNonet[i].isSolved()) cellNonet[i].setImpossibleValue(value);
+			if(!cells.contains(cellNonet.get(i)) && !cellNonet.get(i).isSolved()) cellNonet.get(i).setImpossibleValue(value);
 		}
 	}
 	public boolean isValidAtLocation(int value, Location location){
 		int row = location.getRow();
 		int column = location.getColumn();
 		int nonet = location.getNonet();
-		SudokuCell[] cells = grid.getRow(row);
-		for(int i=0;i<cells.length;i++){
-			if(cells[i].getValue()==value){
+		List<SudokuCell> cells = grid.getRow(row);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
 				return false;
 			}
 		}
 		cells = grid.getColumn(column);
-		for(int i=0;i<cells.length;i++){
-			if(cells[i].getValue()==value){
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
 				return false;
 			}
 		}
 		cells = grid.getNonet(nonet);
-		for(int i=0;i<cells.length;i++){
-			if(cells[i].getValue()==value){
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
 				return false;
 			}
 		}
@@ -170,12 +171,12 @@ public class SudokuSolver {
 		for(int number=1;number<=SIZE;number++){
 			
 			for(int i=0;i<SIZE;i++){
-				SudokuCell[] row = grid.getRow(i+1);
-				for(int j=0; j<row.length;j++){
-					if(!row[j].isSolved() && row[j].getPossibleValues().contains(number)){
-						if(isValidAtLocation(number,row[j].getLocation())){
-							cells.add(row[j]);
-							hiddenSingleMap.put(row[j],number);
+				List<SudokuCell> row = grid.getRow(i+1);
+				for(int j=0; j<row.size();j++){
+					if(!row.get(j).isSolved() && row.get(j).getPossibleValues().contains(number)){
+						if(isValidAtLocation(number,row.get(j).getLocation())){
+							cells.add(row.get(j));
+							hiddenSingleMap.put(row.get(j),number);
 						}
 					}
 				}
@@ -193,12 +194,12 @@ public class SudokuSolver {
 		for(int number=1;number<=SIZE;number++){
 			
 			for(int i=0;i<SIZE;i++){
-				SudokuCell[] column = grid.getColumn(i+1);
-				for(int j=0; j<column.length;j++){
-					if(!column[j].isSolved() && column[j].getPossibleValues().contains(number)){
-						if(isValidAtLocation(number,column[j].getLocation())){
-							cells.add(column[j]);
-							hiddenSingleMap.put(column[j],number);
+				List<SudokuCell> column = grid.getColumn(i+1);
+				for(int j=0; j<column.size();j++){
+					if(!column.get(j).isSolved() && column.get(j).getPossibleValues().contains(number)){
+						if(isValidAtLocation(number,column.get(j).getLocation())){
+							cells.add(column.get(j));
+							hiddenSingleMap.put(column.get(j),number);
 						}
 					}
 				}
@@ -216,12 +217,12 @@ public class SudokuSolver {
 		for(int number=1;number<=SIZE;number++){
 			
 			for(int i=0;i<SIZE;i++){
-				SudokuCell[] nonet = grid.getNonet(i+1);
-				for(int j=0; j<nonet.length;j++){
-					if(!nonet[j].isSolved() && nonet[j].getPossibleValues().contains(number)){
-						if(isValidAtLocation(number,nonet[j].getLocation())){
-							cells.add(nonet[j]);
-							hiddenSingleMap.put(nonet[j],number);
+				List<SudokuCell> nonet = grid.getNonet(i+1);
+				for(int j=0; j<nonet.size();j++){
+					if(!nonet.get(j).isSolved() && nonet.get(j).getPossibleValues().contains(number)){
+						if(isValidAtLocation(number,nonet.get(j).getLocation())){
+							cells.add(nonet.get(j));
+							hiddenSingleMap.put(nonet.get(j),number);
 						}
 					}
 				}

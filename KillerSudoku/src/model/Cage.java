@@ -1,3 +1,4 @@
+package model;
 import java.util.ArrayList;
 import java.util.List;
 public class Cage {
@@ -24,6 +25,10 @@ public class Cage {
 		remaining = total;
 		solved = false;
 	}
+	public void init(){
+		unsolvedLocations.addAll(locations);
+		
+	}
 	public boolean isSolved(){
 		return solved;
 	}
@@ -39,8 +44,8 @@ public class Cage {
 	public int getRemaining(){
 		return remaining;
 	}
-	public void setRemaining(int value){
-		remaining = value;
+	public void decreaseRemaining(int value){
+		remaining -= value;
 	}
 	public void setSolvedLocation(Location location){
 		solvedLocations.add(location);

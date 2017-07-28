@@ -1,5 +1,7 @@
+package model;
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class AnswerParser {
@@ -9,10 +11,10 @@ public static SudokuGrid parseAnswer(String filename) throws FileNotFoundExcepti
 		while(scanner.hasNext()){
 			for(int i=1; i<=9;i++){
 				Scanner line = new Scanner(scanner.nextLine());//take the first line of the file as input
-				SudokuCell[] row = grid.getRow(i);
+				List<SudokuCell> row = grid.getRow(i);
 				for(int j=0;j<9;j++){
 					int value = line.nextInt();
-					row[j].setValue(value);
+					row.get(j).setValue(value);
 				}
 			}
 			
@@ -36,7 +38,7 @@ public static SudokuGrid parseAnswer(String filename) throws FileNotFoundExcepti
 		if(!result){
 			for(int i=0; i<9;i++){
 				for(int j=0;j<9;j++){
-					if(array[i][j].getValue()!=otherArray[i][j].getValue()){
+					if(array[i][j].getValue()!=otherArray[i][j].getValue() && !(array[i][j].getValue()==0)){
 						System.out.println("Incorrect value"+array[i][j].getValue() +" at "+array[i][j].getLocation()+" expected value: "+otherArray[i][j].getValue());
 					}
 				}

@@ -1,3 +1,4 @@
+package model;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class CageParser {
 				column = Integer.parseInt(coordinate.substring(2));
 				cage.addCell(Location.getInstance(row,column));
 			}
+			cage.init();
 			cages.add(cage);
 		}
 		return cages;

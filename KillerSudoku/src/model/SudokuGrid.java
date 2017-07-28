@@ -1,3 +1,4 @@
+package model;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,30 +29,30 @@ public class SudokuGrid {
 		return grid;
 	}
 	
-	public SudokuCell[] getRow(int rowNumber){
-		SudokuCell[] row = new SudokuCell[SIZE];
+	public List<SudokuCell> getRow(int rowNumber){
+		List<SudokuCell> row = new ArrayList<>();
 		for(int i=0;i<SIZE;i++){
-			row[i] = grid[rowNumber-1][i];
+			row.add(grid[rowNumber-1][i]);
 		}
 		return row;
 	}
-	public SudokuCell[] getColumn(int colNumber){
-		SudokuCell[] column = new SudokuCell[SIZE];
+	public List<SudokuCell> getColumn(int colNumber){
+		List<SudokuCell> column = new ArrayList<>();
 		for(int i=0;i<SIZE;i++){
-			column[i] = grid[i][colNumber-1];
+			column.add(grid[i][colNumber-1]);
 		}
 		return column;
 	}
 	public List<SudokuCell> getCellsFromRow(int rowNumber, int startColumn, int endColumn){
 		List<SudokuCell> cells = new ArrayList<>();
-		SudokuCell[] row = getRow(rowNumber);
+		List<SudokuCell> row = getRow(rowNumber);
 		for(int i=startColumn;i<=endColumn;i++){
-			cells.add(row[i-1]);
+			cells.add(row.get(i-1));
 		}
 		return cells;	
 	}
-	public SudokuCell[] getNonet(int nonetNumber){
-		SudokuCell[] nonet = new SudokuCell[SIZE];
+	public List<SudokuCell> getNonet(int nonetNumber){
+		
 		List<SudokuCell> list = new ArrayList<>();
 		for(int i=0;i<SIZE;i++){
 			for(int j=0;j<SIZE;j++){
@@ -60,26 +61,26 @@ public class SudokuGrid {
 				}
 			}
 		}
-		return list.toArray(nonet);
+		return list;
 	}
 	public void printGrid(){
 		for(int i=0;i<9;i++){
-			SudokuCell[] row = getRow(i+1);
-			for(int j=0;j<row.length;j++){
-				System.out.print(row[j]+" ");
+			List<SudokuCell> row = getRow(i+1);
+			for(int j=0;j<row.size();j++){
+				System.out.print(row.get(j)+" ");
 			}
 			System.out.println("");
 		}
 	}
 	public void printNonets(){
 		for(int i=1;i<=9;i++){
-			SudokuCell[] nonet = getNonet(i);
+			List<SudokuCell> nonet = getNonet(i);
 			System.out.println("Nonet "+i);
-			for(int j=0;j<nonet.length;j+=3){
+			for(int j=0;j<nonet.size()-3;j+=3){
 				
-				System.out.print(nonet[j]);
-				System.out.print(nonet[j+1]);
-				System.out.println(nonet[j+2]);
+				System.out.print(nonet.get(j));
+				System.out.print(nonet.get(j+1));
+				System.out.println(nonet.get(j+2));
 			}
 		}
 	}

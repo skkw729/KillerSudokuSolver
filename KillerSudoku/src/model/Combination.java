@@ -1,3 +1,4 @@
+package model;
 import java.util.Set;
 
 //Set of integers that sum to a value

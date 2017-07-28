@@ -1,3 +1,4 @@
+package model;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +31,21 @@ public class KillerSudokuGrid extends SudokuGrid {
 		}
 		return list;
 	}
+	public List<SudokuCell> getCells(List<Location> locations){
+		
+		List<SudokuCell> list = new ArrayList<>();
+		for(Location l : locations){
+			list.add(super.getCell(l));
+		}
+		return list;
+	}
 	public List<Cage> getCages() {
 		return cages;
 	}
 	public Cage getCage(List<Location> coordinates){
 		for(Cage c:cages)
 		{
-			if(c.getCellLocations().contains(coordinates)){
+			if(c.getCellLocations().equals(coordinates)){
 				return c;
 			}
 		}

@@ -1,3 +1,4 @@
+package model;
 import java.util.*;
 public class Sums {
 	private static List<Integer> LIST = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -6,6 +7,12 @@ public class Sums {
 
 	public static List<Combination> getSums(int length, int total, Set<Integer> possibleNumbers){
 		List<Combination> solutions = new ArrayList<>();
+		if(length==1) {
+			Set<Integer> used = new TreeSet<>();
+			used.add(total);
+			solutions.add(new Combination(total, used));
+			return solutions;
+		}
 		getSumRecursively(length, total, possibleNumbers, new TreeSet<>(), solutions);
 		return solutions;
 	}
