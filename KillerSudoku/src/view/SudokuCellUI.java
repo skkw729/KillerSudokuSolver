@@ -7,12 +7,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.util.Set;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 @SuppressWarnings("serial")
@@ -21,6 +18,8 @@ public class SudokuCellUI extends JPanel {
 	private static final int CELL_SIZE = 50;
 	private static final Font SOLVED_FONT = new Font("SansSerif", Font.BOLD, 30);
 	private static final Font UNSOLVED_FONT = new Font("SansSerif", Font.PLAIN, 12);
+	private static Border COMPOUND_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(5,5,5,5));
+	private static Border BORDER = BorderFactory.createLineBorder(Color.black);
 	private Location location;
 	private SudokuCell cell;
 	public SudokuCellUI(SudokuCell cell){
@@ -28,9 +27,11 @@ public class SudokuCellUI extends JPanel {
 		this.cell = cell;
 		location = cell.getLocation();
 		paint();
-		this.setBorder(BorderFactory.createLineBorder(Color.black));
-		this.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+//		this.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
 		
+	}
+	public Dimension getPreferredSize(){
+		return new Dimension(CELL_SIZE, CELL_SIZE);
 	}
 	private void paint() {
 		if(!cell.isSolved()){
@@ -42,15 +43,18 @@ public class SudokuCellUI extends JPanel {
 				if(!cell.getPossibleValues().contains(i)) l.setVisible(false);
 				this.add(l);
 			} 
+			this.setBorder(COMPOUND_BORDER);
 		}
 		else{
 			this.setLayout(new FlowLayout());
 			String value = ""+ cell.getValue();
 			JLabel l = new JLabel(value);
 			l.setHorizontalAlignment(JLabel.CENTER);
+			l.setVerticalAlignment(JLabel.CENTER);
 			l.setFont(SOLVED_FONT);
 			this.add(l);
 		}
+		this.setBorder(COMPOUND_BORDER);
 	}
 	public SudokuCell getCell(){
 		return cell;

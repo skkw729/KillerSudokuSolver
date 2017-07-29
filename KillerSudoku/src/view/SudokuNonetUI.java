@@ -10,8 +10,6 @@ import javax.swing.JPanel;
 import model.SudokuCell;
 
 public class SudokuNonetUI extends JPanel {
-	private static final int SIZE = 9;
-	
 	public SudokuNonetUI(List<SudokuCell> nonet){
 		super(new GridLayout(3,3));
 		for(SudokuCell cell : nonet){
