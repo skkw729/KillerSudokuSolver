@@ -13,7 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class ButtonPanel extends JPanel implements ActionListener{
+public class ButtonPanel extends JPanel{
 	private JButton solveB, loadB;
 	public ButtonPanel(){
 		super();
@@ -21,13 +21,20 @@ public class ButtonPanel extends JPanel implements ActionListener{
 		JPanel panel = new JPanel(new GridBagLayout());
 		this.add(panel, BorderLayout.EAST);
 		solveB = new JButton("Solve");
-		solveB.addActionListener(this);
-//		loadB = new JButton("Load");
+//		solveB.addActionListener(this);
+		loadB = new JButton("Load");
 		panel.add(solveB);
 		panel.setBorder(BorderFactory.createEmptyBorder(200, 0, 0, 0));
-//		this.add(loadB);
+		panel.add(loadB);
+//		loadB.addActionListener(this);
 	}
-	public void actionPerformed(ActionEvent e){
-		System.out.println("solve");
+	public JButton getSolveButton(){
+		return solveB;
 	}
+	public JButton getLoadButton(){
+		return loadB;
+	}
+//	public void actionPerformed(ActionEvent e){
+//		System.out.println("solve");
+//	}
 }

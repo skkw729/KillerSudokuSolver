@@ -14,21 +14,24 @@ import java.util.Set;
 import model.*;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import controller.LoadListener;
+import controller.SolveListener;
 import model.*;
 public class SudokuGridUI {
-	private SudokuCellUI[][] gridUI;
 	private KillerSudokuGrid grid;
 	private List<Cage> cages;
 	private List<SudokuCellUI> listCellUI;
-	Map<Cage, Color> cageColourMap;
+	private ButtonPanel buttonPanel;
+	private Map<Cage, Color> cageColourMap;
 	private static final int SIZE=9;
 	private static final int CELL_SIZE = 70;
 	private JFrame frame;
-	private JPanel contentPanel;
+	private JPanel gridPanel, contentPanel;
 	private static Color RED = new Color(255, 80, 80);
 	private static Color YELLOW = new Color(255, 255, 153);
 	private static Color GREEN = new Color(153, 255, 153);
@@ -43,17 +46,20 @@ public class SudokuGridUI {
 		frame.setLayout(new BorderLayout());
 		cages = grid.getCages();
 		assignAllCageColours();
-		makeGrid(grid);
+		initGrid();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
 	}
-	private void makeGrid(KillerSudokuGrid grid) {
-		contentPanel.removeAll();
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(3,3));
-		contentPanel.add(new ButtonPanel(), BorderLayout.EAST);
-		contentPanel.add(panel, BorderLayout.CENTER);
+	public KillerSudokuGrid getGrid(){
+		return grid;
+	}
+	public void initGrid(){
+		gridPanel = new JPanel();
+		gridPanel.setLayout(new GridLayout(3,3));
+		buttonPanel = new ButtonPanel();
+		contentPanel.add(buttonPanel, BorderLayout.EAST);
+		contentPanel.add(gridPanel, BorderLayout.CENTER);
 		frame.setContentPane(contentPanel);
 		Map<SudokuCell, Integer> cageLeadMap = getCageLeads();
 		for(int i=1;i<=SIZE;i++){
@@ -75,7 +81,36 @@ public class SudokuGridUI {
 				}
 				nonetPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,2));
 			}
-			panel.add(nonetPanel);
+			gridPanel.add(nonetPanel);
+		}
+	}
+	public void makeGrid() {
+		contentPanel.remove(gridPanel);
+		gridPanel = new JPanel();
+		gridPanel.setLayout(new GridLayout(3,3));
+		contentPanel.add(gridPanel, BorderLayout.CENTER);
+		frame.setContentPane(contentPanel);
+		Map<SudokuCell, Integer> cageLeadMap = getCageLeads();
+		for(int i=1;i<=SIZE;i++){
+			JPanel nonetPanel = new JPanel(new GridLayout(3,3));
+			List<SudokuCell> nonet = grid.getNonet(i);
+			for(SudokuCell cell : nonet){
+				Cage cage = grid.getCage(cell.getLocation());
+				Color colour = cageColourMap.get(cage);
+				if(cageLeadMap.get(cell) != null){
+					int cageTotal = cageLeadMap.get(cell);
+					SudokuCellUI sudokuCellUI = new SudokuCellUI(cell, colour, cageTotal);
+					listCellUI.add(sudokuCellUI);
+					nonetPanel.add(sudokuCellUI);
+				}
+				else{
+					SudokuCellUI sudokuCellUI = new SudokuCellUI(cell, colour);
+					listCellUI.add(sudokuCellUI);
+					nonetPanel.add(sudokuCellUI);
+				}
+				nonetPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK,2));
+			}
+			gridPanel.add(nonetPanel);
 		}
 		//		frame.setMinimumSize(new Dimension(SIZE*CELL_SIZE, SIZE*CELL_SIZE));
 		frame.revalidate();
@@ -112,19 +147,19 @@ public class SudokuGridUI {
 		}
 	}
 	private void assignColour(Cage cage, Map<Cage,List<Cage>> adjCages){
-		Color colour = RED;
+		Color colour = PINK;
 		List<Cage> adjacentCages = adjCages.get(cage);
 		if(adjacentCages != null){
 
-			boolean redUsed = false;
+			boolean pinkUsed = false;
 			boolean blueUsed = false;
 			boolean yellowUsed = false;
 			boolean greenUsed = false;
 			for(Cage c : adjacentCages){
 				Color adjColor = cageColourMap.get(c);
 				if(adjColor != null){
-					if(adjColor.equals(RED)){
-						redUsed = true;
+					if(adjColor.equals(PINK)){
+						pinkUsed = true;
 					}
 					else if(adjColor.equals(BLUE)){
 						blueUsed = true;
@@ -137,14 +172,14 @@ public class SudokuGridUI {
 					}
 				}
 				//greedy colouring
-				if(redUsed){
+				if(pinkUsed){
 					colour = BLUE;
 					if(blueUsed){
 						colour = YELLOW;
 						if(yellowUsed){
 							colour = GREEN;
 							if(greenUsed){
-								colour = PINK;
+								colour = RED;
 							}
 						}
 
@@ -194,17 +229,18 @@ public class SudokuGridUI {
 		}
 		return adjacentCages;
 	}
-
+	public ButtonPanel getButtonPanel(){
+		return buttonPanel;
+	}
 	public static void main(String[] args) throws FileNotFoundException{
 		List<Cage> cages = CageParser.parseCages("example1.txt");
 		SudokuGrid answer = AnswerParser.parseAnswer("example1Answer.txt");
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
-		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
-		solver.solveCagesSpanningExtendRegions();
+		KillerSudokuSolver solver = new KillerSudokuSolver(grid);		
 		SudokuGridUI gridUI = new SudokuGridUI(grid);
-		//		solver.setPossibleValuesForCages();
-		//		solver.solveSingleValueCells();
-		//		gridUI.makeGrid(grid);
-
+		gridUI.getButtonPanel().getSolveButton().addActionListener(new SolveListener(gridUI, solver));
+		gridUI.getButtonPanel().getLoadButton().addActionListener(new LoadListener(gridUI, solver));
+		solver.setPossibleCombinationsForCages();
+		gridUI.makeGrid();
 	}
 }
