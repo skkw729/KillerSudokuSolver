@@ -57,7 +57,7 @@ public class Location {
 		return hc;
 	}
 	public String toString(){
-		return "("+row+","+column+")";
+		return "R"+row+"C"+column;
 	}
 
 	public int getNonet() {

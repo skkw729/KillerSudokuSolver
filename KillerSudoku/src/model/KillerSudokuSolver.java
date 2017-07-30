@@ -48,15 +48,15 @@ public class KillerSudokuSolver {
 	public SudokuSolver getSudokuSolver() {
 		return sudokuSolver;
 	}
-	public SudokuCell solveCagesSpanningExtendedRegions(){
+	public Reason solveCagesSpanningExtendedRegions(){
 		for(int i=1;i<=8;i++){
-			SudokuCell cell = solveCagesSpanningRegions(i);
-			if(cell !=null) return cell;
+			Reason reason = solveCagesSpanningRegions(i);
+			if(reason !=null) return reason;
 			
 		}
 		return null;
 	}
-	public SudokuCell solveCagesSpanningRegions(int numberOfRegions){
+	public Reason solveCagesSpanningRegions(int numberOfRegions){
 		for(int i=1;i<=(10-numberOfRegions);i++){
 
 			//rows
@@ -100,8 +100,12 @@ public class KillerSudokuSolver {
 					for(int k=0; k<numberOfRegions;k++){
 						rowsUsed+=(k+i);
 					}
-					System.out.println("Solved using extended rule of 45 on rows "+rowsUsed);
-					return extraCell;
+					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the row(s) "+rowsUsed+
+							"\nSince each row must total 45, the cages contained in "+numberOfRegions+" row(s) must sum to "+ numberOfRegions*REGION_TOTAL
+							+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal;
+					
+					Reason reason = new Reason(message, extraCell);
+					return reason;
 				}
 			}
 			//check if removing cages containing cells from other regions results in a solvable cell
@@ -150,8 +154,12 @@ public class KillerSudokuSolver {
 				missingCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
 				if(!missingCell.isSolved()){
 					solveCell(missingCell, value);
-					System.out.println("Solved using extended rule of 45 on rows "+rowsUsed);
-					return missingCell;
+					String message = missingCell.getLocation()+" has been solved using the extended rule of 45 on the row(s) "+rowsUsed+
+							"\nSince each row must total 45, the cages contained in "+numberOfRegions+" row(s) must sum to "+ numberOfRegions*REGION_TOTAL
+							+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal;
+					
+					Reason reason = new Reason(message, missingCell);
+					return reason;
 
 				}
 			}
@@ -198,8 +206,12 @@ public class KillerSudokuSolver {
 						columnsUsed += (k+i);
 
 					}
-					System.out.println("Solved using extended rule of 45 on columns "+columnsUsed);
-					return extraCell;
+					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
+							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
+							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
+					
+					Reason reason = new Reason(message, extraCell);
+					return reason;
 				}
 
 			}
@@ -249,8 +261,12 @@ public class KillerSudokuSolver {
 						columnsUsed += (k+i);
 					}
 
-					System.out.println("Solved using extended rule of 45 on columns "+columnsUsed);
-					return missingCell;
+					String message = missingCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
+							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
+							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
+					
+					Reason reason = new Reason(message, missingCell);
+					return reason;
 				}
 			}
 		}
@@ -276,7 +292,8 @@ public class KillerSudokuSolver {
 		}
 		return cages;
 	}
-	public void setPossibleValuesForCages(){
+	public List<SudokuCell> setPossibleValuesForCages(){
+		List<SudokuCell> changedCells = new ArrayList<>();
 		List<Cage> cages = grid.getCages();
 		for(Cage cage : cages){
 			if(!cage.isSolved()){
@@ -289,12 +306,19 @@ public class KillerSudokuSolver {
 					}
 				}
 				for(SudokuCell cell : grid.getCells(cage)){
+					Set<Integer> initialValues = new TreeSet<>();
+					initialValues.addAll(cell.getPossibleValues());
 					cell.getPossibleValues().retainAll(possibleSums);
+					if(!initialValues.equals(cell.getPossibleValues())){
+						changedCells.add(cell);
+					}
 				}
 			}
 		}
+		return changedCells;
 	}
-	public void setPossibleCombinationsForCages(){
+	public List<SudokuCell> setPossibleCombinationsForCages(){
+		List<SudokuCell> changedCells = new ArrayList<>();
 		List<Cage> cages = grid.getCages();
 
 		for(Cage cage : cages){
@@ -326,10 +350,15 @@ public class KillerSudokuSolver {
 					}
 				}
 				for(SudokuCell cell : grid.getCells(cage)){
+					Set<Integer> initialValues = new TreeSet<>();
+					initialValues.addAll(cell.getPossibleValues());
 					cell.getPossibleValues().retainAll(possibleSums);
+					if(!initialValues.equals(cell.getPossibleValues())) changedCells.add(cell);
+					
 				}
 			}
 		}
+		return changedCells;
 	}
 	
 	public List<SudokuCell> setPossibleValuesForUniqueCageSums(List<Cage> cages){
@@ -501,9 +530,9 @@ public class KillerSudokuSolver {
 					cageNonetList.add(c);
 				}
 			}
-			if(!cageRowList.isEmpty()) regionMap.put(cageRowList, Region.getInstance(Type.ROW, i));
-			if(!cageColumnList.isEmpty()) regionMap.put(cageColumnList, Region.getInstance(Type.COLUMN, i));
-			if(!cageNonetList.isEmpty()) regionMap.put(cageNonetList, Region.getInstance(Type.NONET, i));
+			if(!cageRowList.isEmpty()) regionMap.put(cageRowList, Region.getInstance(Type.Row, i));
+			if(!cageColumnList.isEmpty()) regionMap.put(cageColumnList, Region.getInstance(Type.Column, i));
+			if(!cageNonetList.isEmpty()) regionMap.put(cageNonetList, Region.getInstance(Type.Nonet, i));
 		}
 		return regionMap;
 	}
@@ -511,20 +540,24 @@ public class KillerSudokuSolver {
 	/*
 	 * removes a unique cage's combinations from the regions that it is contained within 
 	 */
-	public void useSumsAsConstraints(Cage cage, Region region){
-		if(!isUniqueSum(cage)) return;
-		if(cage.isSolved()) return;
+	public Reason useSumsAsConstraints(Cage cage, Region region){
+		if(!isUniqueSum(cage)) return null;
+		if(cage.isSolved()) return null;
 		Set<Integer> cagePossibleNumbers = getPossibleValues(cage);
 		List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), cagePossibleNumbers);
 		Combination combination = combinations.get(0);
 		Set<Integer> numbers = combination.getNumbers();
 		sudokuSolver.removeFromRegion(numbers, grid.getCells(cage), region);
+		Reason reason = new Reason("The "+cage.getTotal()+ "cage located at "+cage.getCellLocations().get(0)+" has only one possible combination and is fully contained within "+region
+				+"/nThis means that this combination cannot appear in "+region+" therefore the combination has been removed from the possible values of cells in "+region);
+		return reason;
 
 	}
-	public void solveSingleValueCells(){
+	public Reason solveSingleValueCells(){
 		for(SudokuCell cell :getSingleValueCellList()){
-			solveSingleValueCell(cell);
+			return solveSingleValueCell(cell);
 		}
+		return null;
 	}
 	public Set<Integer> getPossibleValues(Cage cage){
 		Set<Integer> possibleValues = new TreeSet<>();
@@ -543,13 +576,14 @@ public class KillerSudokuSolver {
 	public List<SudokuCell> getSingleValueCellList(){
 		return sudokuSolver.getSingleValueCellList();
 	}
-	public boolean solveSingleValueCell(SudokuCell cell){
+	public Reason solveSingleValueCell(SudokuCell cell){
 		if(cell.hasSinglePossibleValue()){
 			int value = cell.getSinglePossibleValue();
 			solveCell(cell, value);
-			return true;
+			Reason reason = new Reason(cell.getLocation()+" has only one possible value", cell);
+			return reason;
 		}
-		return false;
+		return null;
 	}
 	public void removeFromAllRegions(SudokuCell cell) {
 		sudokuSolver.removeFromAllZones(cell);

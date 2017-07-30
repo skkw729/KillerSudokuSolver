@@ -11,6 +11,7 @@ public class SolverTest2 {
 		
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
+		solver.solveCagesSpanningExtendedRegions();
 		solver.solveSingleValueCells();
 		solver.setPossibleValuesForCages();
 		solver.solveSingleValueCells();
