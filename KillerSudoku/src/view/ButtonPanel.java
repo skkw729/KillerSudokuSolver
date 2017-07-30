@@ -2,6 +2,7 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -14,27 +15,28 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class ButtonPanel extends JPanel{
-	private JButton solveB, loadB;
+	private JButton solveB, chooseFileB, rule45B;
 	public ButtonPanel(){
 		super();
-		this.setPreferredSize(new Dimension(200,10));
-		JPanel panel = new JPanel(new GridBagLayout());
+		JPanel panel = new JPanel(new FlowLayout());
 		this.add(panel, BorderLayout.EAST);
 		solveB = new JButton("Solve");
-//		solveB.addActionListener(this);
-		loadB = new JButton("Load");
+		rule45B = new JButton("Use rule of 45");
+		chooseFileB = new JButton("Load");
 		panel.add(solveB);
-		panel.setBorder(BorderFactory.createEmptyBorder(200, 0, 0, 0));
-		panel.add(loadB);
-//		loadB.addActionListener(this);
+		panel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
+		panel.add(rule45B);
+		panel.add(chooseFileB);
+		
 	}
 	public JButton getSolveButton(){
 		return solveB;
 	}
 	public JButton getLoadButton(){
-		return loadB;
+		return rule45B;
 	}
-//	public void actionPerformed(ActionEvent e){
-//		System.out.println("solve");
-//	}
+	public JButton getChooseFileButton(){
+		return chooseFileB;
+	}
+
 }

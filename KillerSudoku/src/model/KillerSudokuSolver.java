@@ -22,7 +22,11 @@ public class KillerSudokuSolver {
 		sudokuSolver = new SudokuSolver(grid);
 		solved = false;
 	}
-
+	public void changeGrid(KillerSudokuGrid grid){
+		this.grid = grid;
+		solved = false;
+		sudokuSolver = new SudokuSolver(grid);
+	}
 	public KillerSudokuGrid getGrid() {
 		return grid;
 	}
@@ -44,59 +48,15 @@ public class KillerSudokuSolver {
 	public SudokuSolver getSudokuSolver() {
 		return sudokuSolver;
 	}
-	public void solveCagesSpanningExtendRegions(){
+	public SudokuCell solveCagesSpanningExtendedRegions(){
 		for(int i=1;i<=8;i++){
-			solveCagesSpanningRegions(i);
+			SudokuCell cell = solveCagesSpanningRegions(i);
+			if(cell !=null) return cell;
+			
 		}
+		return null;
 	}
-	public List<SudokuCell> solveCagesSpanningRegion(Map<List<Cage>, Region> cages){
-		Set<List<Cage>> cageList = cages.keySet();
-		List<SudokuCell> solvedCells = new ArrayList<>();
-		for(List<Cage> list : cageList){
-			//find the missing cell for the region
-			Region region = cages.get(list);
-			int regionNumber = region.getNumber();
-			Type type = region.getRegion();
-			int rowColumnTotal=0;
-			int cageTotal = 0;
-			SudokuCell missingCell=null;
-			for(Cage cage : list){
-				cageTotal += cage.getTotal();
-				for(Location location : cage.getCellLocations())
-				{
-					if(type.equals(Type.ROW)){
-						rowColumnTotal += location.getColumn();
-					}
-					else if(type.equals(Type.COLUMN)){
-						rowColumnTotal += location.getRow();
-					}
-					else if(type.equals(Type.NONET)){
-						List<SudokuCell> nonetCells = grid.getNonet(regionNumber);
-						SudokuCell cellAtLocation = grid.getCell(location);
-						if(!nonetCells.contains(cellAtLocation)){
-							missingCell = cellAtLocation;
-						}
-					}
-				}
-			}
-			int cellValue = REGION_TOTAL - cageTotal;
-			int missingValue = REGION_TOTAL - rowColumnTotal;
-			if(type.equals(Type.ROW)){
-				missingCell = grid.getCell(Location.getInstance(regionNumber, missingValue));
-			}
-			else if(type.equals(Type.COLUMN)){
-				missingCell = grid.getCell(Location.getInstance(missingValue, regionNumber));
-			}
-			solveCell(missingCell, cellValue);
-			solvedCells.add(missingCell);
-		}
-		return solvedCells;
-	}
-	public void cageSplit(){
-		//TODO
-		//rule of 45 when using partially filled cage
-	}
-	public void solveCagesSpanningRegions(int numberOfRegions){
+	public SudokuCell solveCagesSpanningRegions(int numberOfRegions){
 		for(int i=1;i<=(10-numberOfRegions);i++){
 
 			//rows
@@ -141,6 +101,7 @@ public class KillerSudokuSolver {
 						rowsUsed+=(k+i);
 					}
 					System.out.println("Solved using extended rule of 45 on rows "+rowsUsed);
+					return extraCell;
 				}
 			}
 			//check if removing cages containing cells from other regions results in a solvable cell
@@ -190,6 +151,7 @@ public class KillerSudokuSolver {
 				if(!missingCell.isSolved()){
 					solveCell(missingCell, value);
 					System.out.println("Solved using extended rule of 45 on rows "+rowsUsed);
+					return missingCell;
 
 				}
 			}
@@ -234,9 +196,10 @@ public class KillerSudokuSolver {
 					String columnsUsed="";
 					for(int k=0; k<numberOfRegions;k++){
 						columnsUsed += (k+i);
-		
+
 					}
 					System.out.println("Solved using extended rule of 45 on columns "+columnsUsed);
+					return extraCell;
 				}
 
 			}
@@ -285,357 +248,13 @@ public class KillerSudokuSolver {
 					for(int k=0; k<numberOfRegions;k++){
 						columnsUsed += (k+i);
 					}
-					
+
 					System.out.println("Solved using extended rule of 45 on columns "+columnsUsed);
+					return missingCell;
 				}
-			}
-			//nonets
-//			cages = new HashSet<>();
-//			List<SudokuCell> nonet = grid.getNonet(i);
-//			for(int j=1; j<numberOfRegions;j++){
-//				nonet.addAll(grid.getNonet(j+i));
-//			}
-//			for(SudokuCell cell : nonet){
-//				cages.add(grid.getCage(cell.getLocation()));
-//			}
-//			totalLength = 0;
-//			for(Cage c : cages){
-//				totalLength += c.getLength();
-//			}
-//			if(totalLength == numberOfRegions*SIZE+1){
-//				int value = 0;
-//				SudokuCell solvableCell = null;
-//				for(Cage cage : cages){
-//					value += cage.getTotal();
-//					for(SudokuCell cell : grid.getCells(cage)){
-//						boolean within = false;
-//						for(int k=0; k<numberOfRegions; k++){
-//							if(cell.getLocation().getNonet()== (k+i)) within = true;
-//						}
-//						if(!within) {
-//							solvableCell = cell;
-//						}
-//					}
-//					
-//				}
-//				value -= numberOfRegions*REGION_TOTAL;
-//				solveCell(solvableCell, value);
-//				String nonetsUsed="";
-//				for(int k=0; k<numberOfRegions;k++){
-//					nonetsUsed += (k+i);
-//				}
-//				
-//				System.out.println("Solved using extended rule of 45 on nonets "+nonetsUsed);
-//			}
-//			cagesFromOtherRegion = new HashSet<>(); 
-//			for(Cage c : cages){
-//					for(SudokuCell cell : grid.getCells(c)){
-//						boolean within = false;
-//						for(int k=0; k<numberOfRegions; k++){
-//							if(cell.getLocation().getNonet()== (k+i)) within = true;
-//						}
-//						if(!within) {
-//							cagesFromOtherRegion.add(c);
-//						}
-//					}
-//			}
-//			for(Cage otherCage : cagesFromOtherRegion){
-//				totalLength -= otherCage.getLength();	
-//			}
-//			cages.removeAll(cagesFromOtherRegion);
-//			if(totalLength==(numberOfRegions*SIZE-1)){
-//				int value = 0;
-//				SudokuCell solvableCell = null;
-//				for(Cage cage : cages){
-//					value += cage.getTotal();
-//					for(SudokuCell cell : nonet){
-//						boolean within = false;
-//						for(int k=0; k<numberOfRegions; k++){
-//							if(cages.contains(grid.getCage(cell.getLocation()))) within = true;
-//						}
-//						if(!within) solvableCell = cell;
-//					}
-//					
-//				}
-//				value = numberOfRegions*REGION_TOTAL - value;
-//				solveCell(solvableCell, value);
-//				String nonetsUsed="";
-//				for(int k=0; k<numberOfRegions;k++){
-//					nonetsUsed += (k+i);
-//				}
-//				
-//				System.out.println("Solved using extended rule of 45 on nonets "+nonetsUsed);
-//				}
-//			
-		}
-	}
-	public void solveCagesSpanningExtendedRegion(){
-		for(int i=1;i<9;i++){
-			//for each pair of row/column/nonets
-			//find the cage associated with each cell
-
-			//rows
-			
-			Set<Cage> cages = new HashSet<>();
-			List<SudokuCell> row = grid.getRow(i);
-			row.addAll(grid.getRow(i+1));
-			for(SudokuCell cell : row){
-				cages.add(grid.getCage(cell.getLocation()));
-			}
-			int totalLength = 0;
-			for(Cage c : cages){
-				totalLength += c.getLength();
-			}
-			if(totalLength==(2*SIZE+1)){
-				//find the extra cell
-				SudokuCell extraCell = null; 
-				int columnNumber=0;
-				int rowNumber=0;
-				int cageTotal=0;
-				for(Cage c : cages){
-					cageTotal += c.getTotal();
-					for(Location location : c.getCellLocations()){
-						columnNumber += location.getColumn();
-						rowNumber += location.getRow();
-					}
-				}
-				int value = cageTotal - 2*REGION_TOTAL;
-				rowNumber = rowNumber - (SIZE*i + SIZE*(i+1));
-				columnNumber = columnNumber - 2*REGION_TOTAL;
-
-				extraCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
-				solveCell(extraCell, value);
-				System.out.println("Solved using extended rule of 45 on rows " + i +" and "+ (i+1));
-			}
-			//check if removing cages containing cells from other regions results in a solvable cell
-			Set<Cage> cagesFromOtherRegion = new HashSet<>(); 
-			for(Cage c : cages){
-				for(Location l : c.getCellLocations()){
-					if(l.getRow()!=i && l.getRow()!=i+1){
-						cagesFromOtherRegion.add(c);
-					}
-				}
-			}
-			for(Cage otherCage : cagesFromOtherRegion){
-				totalLength -= otherCage.getLength();	
-			}
-			cages.removeAll(cagesFromOtherRegion);
-			if(totalLength==(2*SIZE-1)){
-				//find the missing cell
-				SudokuCell missingCell = null;
-				int columnNumber = 0;
-				int rowNumber = 0;
-				int cageTotal = 0;
-				for(Cage c : cages){
-					cageTotal += c.getTotal();
-					for(Location location : c.getCellLocations()){
-						columnNumber += location.getColumn();
-						rowNumber += location.getRow();
-					}
-				}
-				int value = 2*REGION_TOTAL - cageTotal;
-				rowNumber = ( SIZE*i + SIZE*(i+1) ) - rowNumber;
-				columnNumber = 2*REGION_TOTAL - columnNumber;
-
-				missingCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
-				solveCell(missingCell, value);
-				System.out.println("Solved using extended rule of 45 on rows " + i +" and "+ (i+1));
-
-
-			}
-			//columns
-			cages = new HashSet<>();
-			List<SudokuCell> column = grid.getColumn(i);
-			column.addAll(grid.getColumn(i+1));
-			for(SudokuCell cell : column){
-				cages.add(grid.getCage(cell.getLocation()));
-			}
-			totalLength = 0;
-			for(Cage c : cages){
-				totalLength += c.getLength();
-			}
-
-			if(totalLength==(2*SIZE+1)){
-				//find the extra cell
-				SudokuCell extraCell = null; 
-				int columnNumber=0;
-				int rowNumber=0;
-				int cageTotal=0;
-				for(Cage c : cages){
-					cageTotal += cageTotal;
-					for(Location location : c.getCellLocations()){
-						columnNumber += location.getColumn();
-						rowNumber += location.getRow();
-					}
-				}
-				int value = cageTotal - 2*REGION_TOTAL;
-				columnNumber = columnNumber - (SIZE*i + SIZE*(i+1));
-				rowNumber = rowNumber - 2*REGION_TOTAL;
-
-				extraCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
-				solveCell(extraCell, value);
-				System.out.println("Solved using extended rule of 45 on columns " + i +" and "+ (i+1));
-			}
-			//check if removing cages containing cells from other regions results in a solvable cell
-			cagesFromOtherRegion = new HashSet<>(); 
-			for(Cage c : cages){
-				for(Location l : c.getCellLocations()){
-					if(l.getColumn()!=i && l.getColumn()!=i+1){
-						cagesFromOtherRegion.add(c);
-					}
-				}
-			}
-			for(Cage otherCage : cagesFromOtherRegion){
-				totalLength -= otherCage.getLength();	
-			}
-			cages.removeAll(cagesFromOtherRegion);
-			if(totalLength==(2*SIZE-1)){
-				//find the missing cell
-				SudokuCell missingCell = null;
-				int columnNumber = 0;
-				int rowNumber = 0;
-				int cageTotal = 0;
-				for(Cage c : cages){
-					cageTotal += c.getTotal();
-					for(Location location : c.getCellLocations()){
-						columnNumber += location.getColumn();
-						rowNumber += location.getRow();
-					}
-				}
-				int value = 2*REGION_TOTAL - cageTotal;
-				columnNumber = ( SIZE*i + SIZE*(i+1) ) - columnNumber;
-				rowNumber = 2*REGION_TOTAL - rowNumber;
-
-				missingCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
-				solveCell(missingCell, value);
-				System.out.println("Solved using extended rule of 45 on columns " + i +" and "+ (i+1));
-
-			}
-			//nonets
-			cages = new HashSet<>();
-			List<SudokuCell> nonet = grid.getNonet(i);
-			nonet.addAll((grid.getNonet(i+1)));
-			for(SudokuCell cell : nonet){
-				cages.add(grid.getCage(cell.getLocation()));
-			}
-			totalLength = 0;
-			for(Cage c : cages){
-				totalLength += c.getLength();
-			}
-			if(totalLength == 2*SIZE+1){
-				int value = 0;
-				SudokuCell solvableCell = null;
-				for(Cage cage : cages){
-					value += cage.getTotal();
-					for(SudokuCell cell : grid.getCells(cage)){
-						if(cell.getLocation().getNonet()!=i && cell.getLocation().getNonet()!=i+1) {
-							solvableCell = cell;
-						
-						}
-					}
-					
-				}
-				value -= 2*REGION_TOTAL;
-				solveCell(solvableCell, value);
-				System.out.println("Solved using extended rule of 45 on nonets " + i +" and "+ (i+1));
-			}
-			cagesFromOtherRegion = new HashSet<>(); 
-			for(Cage c : cages){
-				for(Location l : c.getCellLocations()){
-					if(l.getNonet()!=i || l.getNonet()!=i+1){
-						cagesFromOtherRegion.add(c);
-					}
-				}
-			}
-			for(Cage otherCage : cagesFromOtherRegion){
-				totalLength -= otherCage.getLength();	
-			}
-			cages.removeAll(cagesFromOtherRegion);
-			if(totalLength==(2*SIZE-1)){
-				int value = 0;
-				SudokuCell solvableCell = null;
-				for(Cage cage : cages){
-					value += cage.getTotal();
-					for(SudokuCell cell : grid.getCells(cage)){
-						if(cell.getLocation().getNonet()!=i && cell.getLocation().getNonet()!=i+1) {
-							solvableCell = cell;
-						
-						}
-					}
-					
-				}
-				value = 2*REGION_TOTAL - value;
-				solveCell(solvableCell, value);
-				System.out.println("Solved using extended rule of 45 on nonets " + i +" and "+ (i+1));
-			}
-			
-		}
-	}
-	public Map<List<Cage>, Region> getCagesSpanningRegion(){
-		//rule of 45 - for each cage, check cell location
-		//check row, column and nonet
-		List<Cage> cages = grid.getCages();
-		Map<Integer, List<Cage>> rowMap = new HashMap<>();
-		Map<Integer, List<Cage>> columnMap = new HashMap<>();
-		Map<Integer, List<Cage>> nonetMap = new HashMap<>();
-		for(int i=1;i<=9;i++){
-			List<Cage> cageRowList = new ArrayList<>();
-			List<Cage> cageColumnList = new ArrayList<>();
-			List<Cage> cageNonetList = new ArrayList<>();
-			for(Cage c : cages){
-				List<Location> locations = c.getCellLocations();
-				boolean sameRow = true;
-				boolean sameColumn = true;
-				boolean sameNonet = true;
-				for(Location l : locations){//check if all cells within a cage are in the same location
-					if(l.getRow()!=i) sameRow = false;
-					if(l.getColumn()!=i) sameColumn = false;
-					if(l.getNonet()!=i) sameNonet = false;
-				}
-				if(sameRow){
-					cageRowList.add(c);
-				}
-				if(sameColumn){
-					cageColumnList.add(c);
-				}
-				if(sameNonet){
-					cageNonetList.add(c);
-				}
-			}
-			rowMap.put(i, cageRowList);
-			columnMap.put(i, cageColumnList);
-			nonetMap.put(i, cageNonetList);
-		}
-		//check length of cages in map
-		Map<List<Cage>, Region> solvableCellMap = new HashMap<>();
-		for(int i=1;i<=9;i++){
-			List<Cage> cageListRow = rowMap.get(i);
-			List<Cage> cageListColumn = columnMap.get(i);
-			List<Cage> cageListNonet = nonetMap.get(i);
-			int span = 0;
-			for(Cage c : cageListRow){
-				span += c.getLength();
-			}
-			if(span == SIZE-1){
-				solvableCellMap.put(cageListRow, Region.getInstance(Type.ROW, i));
-			}
-			span = 0;
-			for(Cage c : cageListColumn){
-				span += c.getLength();
-			}
-			if(span == SIZE-1){
-				solvableCellMap.put(cageListColumn, Region.getInstance(Type.COLUMN, i));
-			}
-			span = 0;
-			for(Cage c : cageListNonet){
-				span += c.getLength();
-			}
-			if(span == SIZE-1){
-				solvableCellMap.put(cageListNonet,Region.getInstance(Type.NONET, i));
 			}
 		}
-
-		return solvableCellMap;
+		return null;
 	}
 	public boolean isUniqueSum(Cage cage){
 		Set<Integer> cagePossibleNumbers = getPossibleValues(cage);
@@ -712,44 +331,7 @@ public class KillerSudokuSolver {
 			}
 		}
 	}
-	public void setPossibleValuesForCagesOfLength2(){
-		List<Cage> cages = grid.getCages();
-		for(Cage cage : cages){
-			if(!cage.isSolved() && cage.getLength()==2){
-				for(SudokuCell cell : grid.getCells(cage)){
-					for(SudokuCell cell2 : grid.getCells(cage)){
-						if(!cell.equals(cell2) && !cell.getPossibleValues().equals(cell2.getPossibleValues())){
-							if(cell.getPossibleValues().size()==2){
-								cell2.getPossibleValues().retainAll(cell.getPossibleValues());
-							}
-							else if(cell2.getPossibleValues().size()==2){
-								cell.getPossibleValues().retainAll(cell2.getPossibleValues());
-							}
-						}
-					}
-				}
-
-			}
-		}
-		cages = getPartiallyFilledCages();
-		for(Cage cage : cages){
-			if(cage.getUnsolvedLocations().size()==2){
-				for(SudokuCell cell : grid.getCells(cage.getUnsolvedLocations())){
-					for(SudokuCell cell2 : grid.getCells(cage.getUnsolvedLocations())){
-						if(!cell.equals(cell2) && !cell.getPossibleValues().equals(cell2.getPossibleValues())){
-							if(cell.getPossibleValues().size()==2){
-								cell2.getPossibleValues().retainAll(cell.getPossibleValues());
-							}
-							else if(cell2.getPossibleValues().size()==2){
-								cell.getPossibleValues().retainAll(cell2.getPossibleValues());
-							}
-						}
-					}
-				}
-			}
-		}
-
-	}
+	
 	public List<SudokuCell> setPossibleValuesForUniqueCageSums(List<Cage> cages){
 		List<SudokuCell> cells = new ArrayList<>();
 		//sets possible values for cages with unique combinations
@@ -975,15 +557,6 @@ public class KillerSudokuSolver {
 	public boolean isValidAtLocation(int value, Location location){
 		return sudokuSolver.isValidAtLocation(value, location);
 	}
-	//	public SudokuCell getHiddenSingleRow(){
-	//		return sudokuSolver.getHiddenSingleRow();
-	//	}
-	//	public SudokuCell getHiddenSingleColumn(){
-	//		return sudokuSolver.getHiddenSingleColumn();
-	//	}
-	//	public SudokuCell getHiddenSingleNonet(){
-	//		return sudokuSolver.getHiddenSingleNonet();
-	//	}
 	private void solveCell(SudokuCell cell, int value){
 		Cage cage = grid.getCage(cell.getLocation());
 		cell.setValue(value);

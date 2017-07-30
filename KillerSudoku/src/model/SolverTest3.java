@@ -12,7 +12,7 @@ public class SolverTest3 {
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
 		//solver.solveCagesSpanningExtendedRegion();
-		solver.solveCagesSpanningExtendRegions();
+		solver.solveCagesSpanningExtendedRegions();
 		grid.printPossibleValues();
 		grid.printGrid();
 		System.out.println(solver.getSingleValueCellList());

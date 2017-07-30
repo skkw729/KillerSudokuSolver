@@ -12,12 +12,6 @@ public class SolverTest {
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);
 //		solver.updateCagePossibleValues();
-		List<SudokuCell> cells = solver.solveCagesSpanningRegion(solver.getCagesSpanningRegion());
-		for(SudokuCell cell : cells){
-			Map<SudokuCell, Integer> cageUpdates = solver.updateCage(cell);
-			solver.solveUpdatedCage(cageUpdates);
-		}
-		
 //		grid.printPossibleValues();
 		
 //		System.out.println(solver.getCagesSpanningRegion());

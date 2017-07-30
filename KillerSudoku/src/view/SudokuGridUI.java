@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import controller.LoadListener;
+import controller.Rule45Listener;
 import controller.SolveListener;
 import model.*;
 public class SudokuGridUI {
@@ -32,7 +32,7 @@ public class SudokuGridUI {
 	private static final int CELL_SIZE = 70;
 	private JFrame frame;
 	private JPanel gridPanel, contentPanel;
-	private static Color RED = new Color(255, 80, 80);
+	private static Color ORANGE = new Color(255, 153, 51);
 	private static Color YELLOW = new Color(255, 255, 153);
 	private static Color GREEN = new Color(153, 255, 153);
 	private static Color BLUE = new Color(153, 204, 255);
@@ -53,6 +53,13 @@ public class SudokuGridUI {
 	}
 	public KillerSudokuGrid getGrid(){
 		return grid;
+	}
+	public void changeGrid(KillerSudokuGrid grid){
+		this.grid = grid;
+		cages = grid.getCages();
+		assignAllCageColours();
+		makeGrid();
+		
 	}
 	public void initGrid(){
 		gridPanel = new JPanel();
@@ -179,7 +186,7 @@ public class SudokuGridUI {
 						if(yellowUsed){
 							colour = GREEN;
 							if(greenUsed){
-								colour = RED;
+								colour = ORANGE;
 							}
 						}
 
@@ -232,15 +239,5 @@ public class SudokuGridUI {
 	public ButtonPanel getButtonPanel(){
 		return buttonPanel;
 	}
-	public static void main(String[] args) throws FileNotFoundException{
-		List<Cage> cages = CageParser.parseCages("example1.txt");
-		SudokuGrid answer = AnswerParser.parseAnswer("example1Answer.txt");
-		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
-		KillerSudokuSolver solver = new KillerSudokuSolver(grid);		
-		SudokuGridUI gridUI = new SudokuGridUI(grid);
-		gridUI.getButtonPanel().getSolveButton().addActionListener(new SolveListener(gridUI, solver));
-		gridUI.getButtonPanel().getLoadButton().addActionListener(new LoadListener(gridUI, solver));
-		solver.setPossibleCombinationsForCages();
-		gridUI.makeGrid();
-	}
+	
 }
