@@ -34,4 +34,10 @@ public class Region {
 	public String toString(){
 		return region+" "+number;
 	}
+	public boolean equals(Object obj){
+		if(this==obj) return true;
+		if(!(obj instanceof Region)) return false;
+		Region r = (Region) obj;
+		return (r.getNumber()==this.getNumber() && r.getRegion().equals(this.getRegion()));
+	}
 }

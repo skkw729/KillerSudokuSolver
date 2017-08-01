@@ -15,25 +15,20 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class ButtonPanel extends JPanel{
-	private JButton solveB, chooseFileB, rule45B;
+	private JButton solveB, chooseFileB;
 	public ButtonPanel(){
 		super();
 		JPanel panel = new JPanel(new FlowLayout());
 		this.add(panel, BorderLayout.EAST);
 		solveB = new JButton("Solve");
-		rule45B = new JButton("Use rule of 45");
 		chooseFileB = new JButton("Load");
 		panel.add(solveB);
 		panel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
-		panel.add(rule45B);
 		panel.add(chooseFileB);
 		
 	}
 	public JButton getSolveButton(){
 		return solveB;
-	}
-	public JButton getLoadButton(){
-		return rule45B;
 	}
 	public JButton getChooseFileButton(){
 		return chooseFileB;

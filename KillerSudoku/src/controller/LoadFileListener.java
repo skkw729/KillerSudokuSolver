@@ -32,6 +32,8 @@ public class LoadFileListener implements ActionListener {
 	    		KillerSudokuGrid grid = CageParser.getKillerSudokuGrid(file);
 				gridUI.changeGrid(grid);
 				solver.changeGrid(grid);
+				solver.setPossibleCombinationsForCages();
+				gridUI.makeGrid();
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

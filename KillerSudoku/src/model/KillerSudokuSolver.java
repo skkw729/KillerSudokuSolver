@@ -16,15 +16,20 @@ public class KillerSudokuSolver {
 	private static final int SIZE = 9;
 	private boolean solved;
 	private SudokuSolver sudokuSolver;
+	private static List<Pair<Cage, Region>> CHECKED_CAGE_REGIONS = new ArrayList<>();
+	private static Map<Integer, List<Integer>> ADJACENT_NONETS = new HashMap<>();
+
 
 	public KillerSudokuSolver(KillerSudokuGrid grid) {
 		this.grid = grid;
 		sudokuSolver = new SudokuSolver(grid);
+		assignAdjacentNonets();
 		solved = false;
 	}
 	public void changeGrid(KillerSudokuGrid grid){
 		this.grid = grid;
 		solved = false;
+		CHECKED_CAGE_REGIONS = new ArrayList<>();
 		sudokuSolver = new SudokuSolver(grid);
 	}
 	public KillerSudokuGrid getGrid() {
@@ -33,6 +38,47 @@ public class KillerSudokuSolver {
 
 	public static int getSize() {
 		return SIZE;
+	}
+	public void assignAdjacentNonets(){
+		//only for SIZE = 9
+		for(int i=1;i<=9;i++){
+			List<Integer> adjNonets = new ArrayList<>();
+			switch(i){
+				case 1:	adjNonets.add(2);
+						adjNonets.add(4);
+						
+				case 2: adjNonets.add(1);
+						adjNonets.add(3);
+						adjNonets.add(5);
+						
+				case 3: adjNonets.add(2);
+						adjNonets.add(6);
+						
+				case 4: adjNonets.add(1);
+						adjNonets.add(5);
+						adjNonets.add(7);
+						
+				case 5: adjNonets.add(2);
+						adjNonets.add(4);
+						adjNonets.add(6);
+						adjNonets.add(8);
+						
+				case 6: adjNonets.add(3);
+						adjNonets.add(5);
+						adjNonets.add(9);
+						
+				case 7: adjNonets.add(4);
+						adjNonets.add(8);
+						
+				case 8: adjNonets.add(5);
+						adjNonets.add(7);
+						adjNonets.add(9);
+						
+				case 9: adjNonets.add(6);
+						adjNonets.add(8);
+			}
+			ADJACENT_NONETS.put(i,adjNonets);
+		}
 	}
 
 	public boolean isSolved() {
@@ -44,7 +90,94 @@ public class KillerSudokuSolver {
 		solved = true;
 		return true;
 	}
-
+	public Reason solveAllAdjacentNonets(){
+		for(int i=0;i<SIZE;i++){
+			Reason r = solveAdjacentNonets(i);
+			if(r!=null) return r;
+		}
+		return null;
+	}
+	public Reason solveAdjacentNonets(int numberOfNonets){
+		
+		for(int i=1;i<=SIZE;i++){
+			Set<Cage> cages = new HashSet<>();
+			List<SudokuCell> nonet = grid.getNonet(i);
+			List<Integer> adjNonets = ADJACENT_NONETS.get(i);
+			Set<Integer> nonetsUsed = new TreeSet<>();
+			nonetsUsed.add(i);
+			for(int j=0;j<numberOfNonets;j++){
+				if(j<adjNonets.size()){
+					nonet.addAll(grid.getNonet(adjNonets.get(j)));
+					nonetsUsed.add(adjNonets.get(j));
+				}
+			}
+			int totalLength = 0;
+			for(SudokuCell cell : nonet){
+				cages.add(grid.getCage(cell.getLocation()));
+			}
+			for(Cage c : cages){
+				totalLength +=c.getLength();
+			}
+			if(totalLength == nonetsUsed.size()*SIZE + 1){
+				//find extra cell
+				SudokuCell cell = null;
+				int cageTotal=0;
+				for(Cage c : cages){
+					cageTotal+=c.getTotal();
+					for(Location l : c.getCellLocations()){
+						if(!nonetsUsed.contains(l.getNonet()))cell = grid.getCell(l);
+					}
+				}
+				int value = cageTotal - REGION_TOTAL*nonetsUsed.size();
+				if(!cell.isSolved()){
+					solveCell(cell, value);
+					String s = cell.getLocation()+" has been solved using the extended rule of 45 on the nonet(s) "+nonetsUsed+
+								"\nSince each nonet must total 45, the cages contained in "+nonetsUsed.size()+" nonet(s) must sum to "+ nonetsUsed.size()*REGION_TOTAL
+								+"\nThe cages in nonet(s) "+nonetsUsed+" sum to "+cageTotal;
+					Reason r = new Reason(s,cell);
+					return r;
+				}
+			}
+			Set<Cage> cagesFromOtherNonet = new HashSet<>();
+			for(Cage c : cages){
+				for(Location l : c.getCellLocations()){
+					if(!nonetsUsed.contains(l.getNonet())) cagesFromOtherNonet.add(c);
+				}
+			}
+			for(Cage cage : cagesFromOtherNonet){
+				cages.remove(cage);
+				totalLength -= cage.getLength();
+			}
+			if(totalLength==nonetsUsed.size()*SIZE-1){
+				int cageTotal = 0;
+				SudokuCell cell = null;
+				List<Location> locationList = new ArrayList<>();
+				for(Cage c : cages){
+					cageTotal += c.getTotal();
+					for(Location l : c.getCellLocations()){
+						locationList.add(l);
+					}
+				}
+				for(SudokuCell cell2 : nonet){
+					if(!locationList.contains(cell2.getLocation())){
+						cell = cell2;
+					}
+				}
+				int value = REGION_TOTAL*nonetsUsed.size() - cageTotal;		
+				if(!cell.isSolved()){
+					solveCell(cell, value);
+					String s =  cell.getLocation()+" has been solved using the extended rule of 45 on the nonet(s) "+nonetsUsed+
+							"\nSince each nonet must total 45, the cages contained in "+nonetsUsed.size()+" nonet(s) must sum to "+ nonetsUsed.size()*REGION_TOTAL
+							+"\nThe cages in nonet(s) "+nonetsUsed+" sum to "+cageTotal;
+					Reason r = new Reason(s, cell);
+					return r;
+				}
+			}
+				
+		}
+		return null;
+		
+	}
 	public SudokuSolver getSudokuSolver() {
 		return sudokuSolver;
 	}
@@ -52,7 +185,7 @@ public class KillerSudokuSolver {
 		for(int i=1;i<=8;i++){
 			Reason reason = solveCagesSpanningRegions(i);
 			if(reason !=null) return reason;
-			
+
 		}
 		return null;
 	}
@@ -103,7 +236,7 @@ public class KillerSudokuSolver {
 					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the row(s) "+rowsUsed+
 							"\nSince each row must total 45, the cages contained in "+numberOfRegions+" row(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal;
-					
+
 					Reason reason = new Reason(message, extraCell);
 					return reason;
 				}
@@ -157,7 +290,7 @@ public class KillerSudokuSolver {
 					String message = missingCell.getLocation()+" has been solved using the extended rule of 45 on the row(s) "+rowsUsed+
 							"\nSince each row must total 45, the cages contained in "+numberOfRegions+" row(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal;
-					
+
 					Reason reason = new Reason(message, missingCell);
 					return reason;
 
@@ -209,7 +342,7 @@ public class KillerSudokuSolver {
 					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
 							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
-					
+
 					Reason reason = new Reason(message, extraCell);
 					return reason;
 				}
@@ -264,7 +397,7 @@ public class KillerSudokuSolver {
 					String message = missingCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
 							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
-					
+
 					Reason reason = new Reason(message, missingCell);
 					return reason;
 				}
@@ -354,13 +487,13 @@ public class KillerSudokuSolver {
 					initialValues.addAll(cell.getPossibleValues());
 					cell.getPossibleValues().retainAll(possibleSums);
 					if(!initialValues.equals(cell.getPossibleValues())) changedCells.add(cell);
-					
+
 				}
 			}
 		}
 		return changedCells;
 	}
-	
+
 	public List<SudokuCell> setPossibleValuesForUniqueCageSums(List<Cage> cages){
 		List<SudokuCell> cells = new ArrayList<>();
 		//sets possible values for cages with unique combinations
@@ -501,6 +634,19 @@ public class KillerSudokuSolver {
 		}
 		return solvedCells;
 	}
+	public List<Reason> removeUniqueCageSumsFromRegions(){
+		List<Reason> list = new ArrayList<>();
+		Map<List<Cage>, Region> map = getRegionsContainingCages();
+		Set<List<Cage>> keySet = map.keySet();
+		for(List<Cage> cageList : keySet){
+			Region region = map.get(cageList);
+			for(Cage cage : cageList){
+				Reason r = useSumsAsConstraints(cage, region);
+				if(r!=null) list.add(r);
+			}
+		}
+		return list;
+	}
 	/*
 	 * cages completely contained within a region
 	 */
@@ -541,6 +687,8 @@ public class KillerSudokuSolver {
 	 * removes a unique cage's combinations from the regions that it is contained within 
 	 */
 	public Reason useSumsAsConstraints(Cage cage, Region region){
+		Pair<Cage, Region> cageRegion = new Pair<Cage, Region>(cage,region);
+		if(CHECKED_CAGE_REGIONS.contains(cageRegion)) return null;
 		if(!isUniqueSum(cage)) return null;
 		if(cage.isSolved()) return null;
 		Set<Integer> cagePossibleNumbers = getPossibleValues(cage);
@@ -548,8 +696,9 @@ public class KillerSudokuSolver {
 		Combination combination = combinations.get(0);
 		Set<Integer> numbers = combination.getNumbers();
 		sudokuSolver.removeFromRegion(numbers, grid.getCells(cage), region);
-		Reason reason = new Reason("The "+cage.getTotal()+ "cage located at "+cage.getCellLocations().get(0)+" has only one possible combination and is fully contained within "+region
-				+"/nThis means that this combination cannot appear in "+region+" therefore the combination has been removed from the possible values of cells in "+region);
+		CHECKED_CAGE_REGIONS.add(cageRegion);
+		Reason reason = new Reason("The "+cage.getTotal()+ " cage located at "+cage.getCellLocations().get(0)+" has only one possible combination and is fully contained within "+region
+				+"\nThis means that this combination cannot appear in "+region+" therefore "+numbers +" has been removed from the possible values of cells in "+region+"\n\n");
 		return reason;
 
 	}

@@ -19,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import controller.Rule45Listener;
 import controller.SolveListener;
 import model.*;
 public class SudokuGridUI {
