@@ -77,8 +77,15 @@ public class SolveListener implements ActionListener{
 									
 								}
 								else{
-								running = false;
-
+									reason = solver.setSinglePositionCombinationAllCages();
+									if(reason!=null) {
+										gridUI.makeGrid();
+										JOptionPane.showMessageDialog(null, reason.getMessage());
+									}
+									else{
+										running = false;
+										JOptionPane.showMessageDialog(null, "This program is unable to solve any further");
+									}
 							}
 						}
 
@@ -91,5 +98,6 @@ public class SolveListener implements ActionListener{
 				i++;	
 			}
 		}
+		if(solver.isSolved()) JOptionPane.showMessageDialog(null, "This puzzle has been solved!");
 	}
 }

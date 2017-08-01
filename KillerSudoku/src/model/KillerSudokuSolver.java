@@ -715,6 +715,53 @@ public class KillerSudokuSolver {
 		}
 		return possibleValues;
 	}
+	public Reason setSinglePositionCombinationAllCages(){
+		List<Cage> cages = getCagesWithUniqueSum();
+		for(Cage cage : cages){
+			Reason r = setSinglePositionCombination(cage);
+			if(r != null) return r;
+		}
+		return null;
+	}
+	/*
+	 * if a cage has a single possible combination, check if any of the numbers
+	 * have a single possible position within the cage
+	 */
+	public Reason setSinglePositionCombination(Cage cage){
+		if(!isUniqueSum(cage)) return null;
+		if(cage.isSolved()) return null;
+		Set<Integer> possibleNumbers = new TreeSet<>();
+		for(Location l : cage.getUnsolvedLocations()){
+			possibleNumbers.addAll(grid.getCell(l).getPossibleValues());
+		}
+		List<Combination> combinations = Sums.getSums(cage.getUnsolvedLocations().size(), cage.getRemaining(), possibleNumbers);
+		Combination combination = combinations.get(0);
+		Set<Integer> numbers = combination.getNumbers();
+		for(int i : numbers){
+			int possiblePositions = 0;
+			for(Location l : cage.getUnsolvedLocations()){
+				if(grid.getCell(l).getPossibleValues().contains(i)) possiblePositions++;
+			}
+			if(possiblePositions==1){
+				int value = i;
+				SudokuCell cell = null;
+				//find the cell
+				for(Location l : cage.getUnsolvedLocations()){
+					 if(grid.getCell(l).getPossibleValues().contains(i)) cell = grid.getCell(l);
+				}
+				if(!cell.isSolved()){
+					solveCell(cell, value);
+				String message = "The "+cage.getTotal()+" cage located at "+cage.getCellLocations().get(0)+" can only have one combination of numbers "+
+						numbers+".\nThere is only one possible location for the value "+value+" within this cage.";
+				Reason r = new Reason(message, cell);
+				return r;
+				}
+			}
+			
+		}
+		return null;
+		
+	}
 	public Set<Integer> getPossibleValues(List<SudokuCell> cells){
 		Set<Integer> possibleValues = new TreeSet<>();
 		for(SudokuCell cell : cells){
@@ -734,6 +781,7 @@ public class KillerSudokuSolver {
 		}
 		return null;
 	}
+	
 	public void removeFromAllRegions(SudokuCell cell) {
 		sudokuSolver.removeFromAllZones(cell);
 	}
