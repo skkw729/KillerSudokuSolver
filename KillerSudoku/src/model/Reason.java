@@ -11,13 +11,17 @@ public class Reason {
 	private List<SudokuCell> cellsChanged;
 	public Reason(String s){
 		message = s;
+		cellsChanged = null;
+		cell = null;
 	}
 	public Reason(String s, SudokuCell c){
 		this(s);
 		cell = c;
+		cellsChanged = null;
 	}
 	public Reason(String s, List<SudokuCell> cells){
 		message = s;
+		cell = null;
 		cellsChanged = cells;
 	}
 	public String getMessage(){

@@ -57,6 +57,12 @@ public class Sums {
 			return;
 		}
 	}
+//	public static List<Combination> getSumsWithDupes(int length, int total){
+//		
+//	}
+//	public static List<Combination> getSumswithDupesRecur(int legnth, int total, List<Integer> numbersUsed, List<Combination> solutions){
+//		
+//	}
 	public static List<Combination> getSums(int length, int total){
 		return getSums(length, total, NUMBERS);
 	}

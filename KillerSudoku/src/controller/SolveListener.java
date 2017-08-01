@@ -29,7 +29,6 @@ public class SolveListener implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		solver.setPossibleValuesForCages();
 		solver.solveSingleValueCells();
-		int i=0;
 		boolean running = true;
 		while(!solver.isSolved() && running){
 			Reason reason = solver.solveCagesSpanningExtendedRegions();
@@ -37,15 +36,14 @@ public class SolveListener implements ActionListener{
 				String s = reason.getMessage();
 				gridUI.makeGrid();
 				JOptionPane.showMessageDialog(null, s);
-				
+
 			}
 			else{
 				reason = solver.solveAllAdjacentNonets();
 				if(reason!=null){
-					String s = reason.getMessage();
-					gridUI.makeGrid();
-					JOptionPane.showMessageDialog(null, s);
-					
+						String s = reason.getMessage();
+						gridUI.makeGrid();
+						JOptionPane.showMessageDialog(null, s);
 				}
 				else{
 					reason = solver.solveSingleValueCells();
@@ -53,49 +51,42 @@ public class SolveListener implements ActionListener{
 						String s = reason.getMessage();
 						gridUI.makeGrid();
 						JOptionPane.showMessageDialog(null, s);
-						
+
 					}
-					
-						
-						else {
-							solver.setPossibleCombinationsForCages();
-							if(!solver.setPossibleCombinationsForCages().isEmpty())gridUI.makeGrid();
+					else {
+						solver.setPossibleCombinationsForCages();
+						if(!solver.setPossibleCombinationsForCages().isEmpty())gridUI.makeGrid();
+						else{
+							reasons = solver.removeUniqueCageSumsFromRegions();
+							if(!reasons.isEmpty()){
+								String s = "";
+								for(Reason r : reasons){
+									s += r.getMessage();
+								}
+								JTextArea textArea = new JTextArea(s);
+								JScrollPane scrollPane = new JScrollPane(textArea);
+								textArea.setLineWrap(true);
+								textArea.setWrapStyleWord(true);
+								scrollPane.setPreferredSize(new Dimension (500,500));
+								gridUI.makeGrid();
+								JOptionPane.showMessageDialog(null,scrollPane);
+
+							}
 							else{
-								reasons = solver.removeUniqueCageSumsFromRegions();
-								if(!reasons.isEmpty()){
-									String s = "";
-									for(Reason r : reasons){
-										s += r.getMessage();
-									}
-									JTextArea textArea = new JTextArea(s);
-									JScrollPane scrollPane = new JScrollPane(textArea);
-									textArea.setLineWrap(true);
-									textArea.setWrapStyleWord(true);
-									scrollPane.setPreferredSize(new Dimension (500,500));
+								reason = solver.setSinglePositionCombinationAllCages();
+								if(reason!=null) {
 									gridUI.makeGrid();
-									JOptionPane.showMessageDialog(null,scrollPane);
-									
+									JOptionPane.showMessageDialog(null, reason.getMessage());
 								}
 								else{
-									reason = solver.setSinglePositionCombinationAllCages();
-									if(reason!=null) {
-										gridUI.makeGrid();
-										JOptionPane.showMessageDialog(null, reason.getMessage());
-									}
-									else{
-										running = false;
-										JOptionPane.showMessageDialog(null, "This program is unable to solve any further");
-									}
+									running = false;
+									JOptionPane.showMessageDialog(null, "This program is unable to solve any further");
+								}
 							}
 						}
 
 					}
-
-
 				}
-				
-
-				i++;	
 			}
 		}
 		if(solver.isSolved()) JOptionPane.showMessageDialog(null, "This puzzle has been solved!");
