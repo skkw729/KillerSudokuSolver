@@ -19,40 +19,58 @@ import view.SudokuGridUI;
 public class SolveListener implements ActionListener{
 	private SudokuGridUI gridUI;
 	private KillerSudokuSolver solver;
+	private ButtonPanel buttonPanel;
 	List<Reason> reasons;
-	public SolveListener(SudokuGridUI gridUI, KillerSudokuSolver solver){
+	public SolveListener(SudokuGridUI gridUI, KillerSudokuSolver solver, ButtonPanel buttonPanel){
 		this.gridUI = gridUI;
 		this.solver = solver;
+		this.buttonPanel = buttonPanel;
 		reasons = new ArrayList<>();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		solver.setPossibleCombinationsForCages();
+		gridUI.makeGrid();
 		solver.setPossibleValuesForCages();
 		solver.solveSingleValueCells();
 		boolean running = true;
 		while(!solver.isSolved() && running){
 			Reason reason = solver.solveCagesSpanningExtendedRegions();
 			if(reason != null){
+				if(buttonPanel.getHelpCheckBox().isSelected()){
 				String s = reason.getMessage();
-//				gridUI.makeGrid();
-				JOptionPane.showMessageDialog(null, s);
+				JTextArea textArea = new JTextArea(s);
+				JScrollPane scrollPane = new JScrollPane(textArea);
+				textArea.setLineWrap(true);
+				textArea.setWrapStyleWord(true);
+				scrollPane.setPreferredSize(new Dimension (200,150));
+				JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+				}
 				gridUI.makeGrid();
 
 			}
 			else{
 				reason = solver.solveAllAdjacentNonets();
 				if(reason!=null){
+					if(buttonPanel.getHelpCheckBox().isSelected()){
 						String s = reason.getMessage();
-//						gridUI.makeGrid();
-						JOptionPane.showMessageDialog(null, s);
+						JTextArea textArea = new JTextArea(s);
+						JScrollPane scrollPane = new JScrollPane(textArea);
+						textArea.setLineWrap(true);
+						textArea.setWrapStyleWord(true);
+						scrollPane.setPreferredSize(new Dimension (200,150));
+						JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+					}
 						gridUI.makeGrid();
 				}
 				else{
 					reason = solver.solveSingleValueCells();
 					if(reason != null){
+						if(buttonPanel.getHelpCheckBox().isSelected()){
 						String s = reason.getMessage();
 //						gridUI.makeGrid();
-						JOptionPane.showMessageDialog(null, s);
+						JOptionPane.showMessageDialog(buttonPanel, s);
+						}
 						gridUI.makeGrid();
 
 					}
@@ -62,6 +80,7 @@ public class SolveListener implements ActionListener{
 						else{
 							reasons = solver.removeUniqueCageSumsFromRegions();
 							if(!reasons.isEmpty()){
+								if(buttonPanel.getHelpCheckBox().isSelected()){
 								String s = "";
 								for(Reason r : reasons){
 									s += r.getMessage();
@@ -70,21 +89,23 @@ public class SolveListener implements ActionListener{
 								JScrollPane scrollPane = new JScrollPane(textArea);
 								textArea.setLineWrap(true);
 								textArea.setWrapStyleWord(true);
-								scrollPane.setPreferredSize(new Dimension (500,500));
+								scrollPane.setPreferredSize(new Dimension (200,150));
 //								gridUI.makeGrid();
-								JOptionPane.showMessageDialog(null,scrollPane);
+								JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+								}
 								gridUI.makeGrid();
 							}
 							else{
 								reason = solver.setSinglePositionCombinationAllCages();
 								if(reason!=null) {
-//									gridUI.makeGrid();
-									JOptionPane.showMessageDialog(null, reason.getMessage());
+									if(buttonPanel.getHelpCheckBox().isSelected()){
+									JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
+									}
 									gridUI.makeGrid();
 								}
 								else{
 									running = false;
-									JOptionPane.showMessageDialog(null, "This program is unable to solve any further");
+									JOptionPane.showMessageDialog(buttonPanel, "This program is unable to solve any further");
 								}
 							}
 						}
@@ -93,6 +114,6 @@ public class SolveListener implements ActionListener{
 				}
 			}
 		}
-		if(solver.isSolved()) JOptionPane.showMessageDialog(null, "This puzzle has been solved!");
+		if(solver.isSolved()) JOptionPane.showMessageDialog(buttonPanel, "This puzzle has been solved!");
 	}
 }

@@ -79,4 +79,9 @@ public class SudokuCellUI extends JPanel {
 	public Location getCellLocation(){
 		return location;
 	}
+	public void setBlank(){
+		this.removeAll();
+		this.revalidate();
+		this.repaint();
+	}
 }

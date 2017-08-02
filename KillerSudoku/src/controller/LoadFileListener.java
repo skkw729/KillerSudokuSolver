@@ -11,6 +11,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import model.CageParser;
 import model.KillerSudokuGrid;
 import model.KillerSudokuSolver;
+import view.SudokuCellUI;
 import view.SudokuGridUI;
 
 public class LoadFileListener implements ActionListener {
@@ -32,9 +33,11 @@ public class LoadFileListener implements ActionListener {
 	    		KillerSudokuGrid grid = CageParser.getKillerSudokuGrid(file);
 				gridUI.changeGrid(grid);
 				solver.changeGrid(grid);
-				solver.setPossibleCombinationsForCages();
-				gridUI.makeGrid();
-			} catch (FileNotFoundException e1) {
+				for(SudokuCellUI cellUI : gridUI.getListUI()){
+					cellUI.setBlank();
+				}
+	    	}
+				catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}

@@ -8,14 +8,20 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 public class ButtonPanel extends JPanel{
-	private JButton solveB, chooseFileB;
+	private static final long serialVersionUID = 1L;
+	private JButton solveB, chooseFileB, solveOneStepB;
+	private JCheckBox help;
 	public ButtonPanel(){
 		super();
 		JPanel panel = new JPanel(new FlowLayout());
@@ -23,8 +29,13 @@ public class ButtonPanel extends JPanel{
 		solveB = new JButton("Solve");
 		chooseFileB = new JButton("Load");
 		panel.add(solveB);
-		panel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
 		panel.add(chooseFileB);
+		solveOneStepB = new JButton("Solve One Step");
+		panel.add(solveOneStepB);
+		panel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
+		help = new JCheckBox("Help");
+		help.setSelected(true);
+		panel.add(help);
 		
 	}
 	public JButton getSolveButton(){
@@ -32,6 +43,12 @@ public class ButtonPanel extends JPanel{
 	}
 	public JButton getChooseFileButton(){
 		return chooseFileB;
+	}
+	public JButton getSolveOneButton(){
+		return solveOneStepB;
+	}
+	public JCheckBox getHelpCheckBox(){
+		return help;
 	}
 
 }

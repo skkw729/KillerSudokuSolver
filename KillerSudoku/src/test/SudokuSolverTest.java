@@ -18,7 +18,7 @@ public class SudokuSolverTest implements Runnable {
 		// TODO Auto-generated method stub
 		List<Cage> cages = null;
 		try {
-			cages = CageParser.parseCages("example2.txt");
+			cages = CageParser.parseCages("example1.txt");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -26,10 +26,11 @@ public class SudokuSolverTest implements Runnable {
 		KillerSudokuGrid grid = new KillerSudokuGrid(cages);
 		KillerSudokuSolver solver = new KillerSudokuSolver(grid);		
 		SudokuGridUI gridUI = new SudokuGridUI(grid);
-		gridUI.getButtonPanel().getSolveButton().addActionListener(new SolveListener(gridUI, solver));
+		gridUI.getButtonPanel().getSolveButton().addActionListener(new SolveListener(gridUI, solver, gridUI.getButtonPanel()));
 		gridUI.getButtonPanel().getChooseFileButton().addActionListener(new LoadFileListener(gridUI, solver));
-		solver.setPossibleCombinationsForCages();
-		gridUI.makeGrid();
+		gridUI.getButtonPanel().getSolveOneButton().addActionListener(new SolveOnceListener(gridUI, solver, gridUI.getButtonPanel()));
+		gridUI.getButtonPanel().getHelpCheckBox().addItemListener(new HelpCheckBoxListener(gridUI));
+		gridUI.blankGrid();
 
 	}
 	public static void main(String[] args){

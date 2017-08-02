@@ -235,6 +235,14 @@ public class SudokuGridUI {
 		}
 		return adjacentCages;
 	}
+	public List<SudokuCellUI> getListUI(){
+		return listCellUI;
+	}
+	public void blankGrid(){
+		for(SudokuCellUI cellUI : listCellUI){
+			cellUI.setBlank();
+		}
+	}
 	public ButtonPanel getButtonPanel(){
 		return buttonPanel;
 	}
