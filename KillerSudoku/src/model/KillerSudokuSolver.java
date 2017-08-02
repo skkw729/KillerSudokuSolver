@@ -18,8 +18,8 @@ public class KillerSudokuSolver {
 	private SudokuSolver sudokuSolver;
 	private static List<Pair<Cage, Region>> CHECKED_CAGE_REGIONS = new ArrayList<>();
 	private static Map<Integer, List<Integer>> ADJACENT_NONETS = new HashMap<>();
-	private static List<Pair<SudokuCell, SudokuCell>> CHECKED_SUM_CONSTRAINT = new ArrayList<>();
-	private static List<Pair<SudokuCell, SudokuCell>> CHECK_SUBSTRACT_CONSTRAINT = new ArrayList<>();
+	private static List<Triple<SudokuCell, SudokuCell,Integer>> CHECKED_SUM_CONSTRAINT = new ArrayList<>();
+	private static List<Triple<SudokuCell, SudokuCell, Integer>> CHECK_SUBSTRACT_CONSTRAINT = new ArrayList<>();
 
 	public KillerSudokuSolver(KillerSudokuGrid grid) {
 		this.grid = grid;
@@ -139,8 +139,8 @@ public class KillerSudokuSolver {
 				}
 				int value = cageTotal - nonetsUsed.size()*REGION_TOTAL;
 				//both cells must sum to this value
-				Pair<SudokuCell, SudokuCell> p = new Pair<SudokuCell, SudokuCell>(cell1, cell2);
-				if(!CHECKED_SUM_CONSTRAINT.contains(p)){
+				Triple<SudokuCell, SudokuCell, Integer> t = new Triple<SudokuCell, SudokuCell, Integer>(cell1, cell2, value);
+				if(!CHECKED_SUM_CONSTRAINT.contains(t)){
 					//check if constraint exists
 					if(!cell1.isSolved() || !cell1.isSolved()){
 						while(true){
@@ -168,9 +168,9 @@ public class KillerSudokuSolver {
 						cells.add(cell1);
 						cells.add(cell2);
 						String s = cell1.getLocation() + " and " + cell2.getLocation() + " must sum to " + value +"\nThis is because the cages within nonet(s) "+nonetsUsed+" must sum to "
-								+nonetsUsed.size()*REGION_TOTAL+"\nThe cages in nonet(s) "+nonetsUsed+" sum to "+cageTotal+"\nPossible values of these cells have been adjusted to fit this constaint";
+								+nonetsUsed.size()*REGION_TOTAL+"\nThe cages in nonet(s) "+nonetsUsed+" sum to "+cageTotal+"\nPossible values of these cells have been adjusted to fit this constraint";
 						Reason r = new Reason(s,cells);
-						CHECKED_SUM_CONSTRAINT.add(p);
+						CHECKED_SUM_CONSTRAINT.add(t);
 						return r;
 					}
 				}
@@ -251,9 +251,12 @@ public class KillerSudokuSolver {
 
 			//rows
 			Set<Cage> cages = new HashSet<>();
+			Set<Integer> rowsUsed = new HashSet<>();
+			rowsUsed.add(i);
 			List<SudokuCell> row = grid.getRow(i);
 			for(int j=1; j< numberOfRegions;j++){
 				row.addAll(grid.getRow(j+i));
+				rowsUsed.add(j+1);
 			}
 			for(SudokuCell cell : row){
 				cages.add(grid.getCage(cell.getLocation()));
@@ -262,6 +265,62 @@ public class KillerSudokuSolver {
 			for(Cage c : cages){
 				totalLength += c.getLength();
 			}
+//			if(totalLength==numberOfRegions*SIZE+2){
+//				//find both extra cells
+//				SudokuCell cell1 = null;
+//				SudokuCell cell2 = null;
+//				int cageTotal = 0;
+//				for(Cage c : cages){
+//					cageTotal += c.getTotal();
+//					for(Location l : c.getCellLocations()){
+//						if(!rowsUsed.contains(l.getRow())){
+//							if(cell1==null && cell2==null){
+//								cell1=grid.getCell(l);
+//							}
+//							else{
+//								cell2=grid.getCell(l);
+//							}
+//						}
+//					}
+//				}
+//				int value = cageTotal - numberOfRegions*REGION_TOTAL;
+//				//both cells must sum to this value
+//				Triple<SudokuCell, SudokuCell, Integer> t = new Triple<SudokuCell, SudokuCell, Integer>(cell1, cell2, value);
+//				if(!CHECKED_SUM_CONSTRAINT.contains(t)){
+//					//check if constraint exists
+//					if(!cell1.isSolved() || !cell1.isSolved()){
+//						while(true){
+//							Set<Integer> impossibleValues = new TreeSet<>();
+//							for(int cell1Value : cell1.getPossibleValues()){
+//								boolean impossible = true;
+//								for(int cell2Value : cell2.getPossibleValues()){
+//									if(cell1Value+cell2Value==value) impossible = false;
+//								}
+//								if(impossible) impossibleValues.add(cell1Value);
+//							}
+//							cell1.getPossibleValues().removeAll(impossibleValues);
+//							impossibleValues.clear();
+//							for(int cell2Value : cell2.getPossibleValues()){
+//								boolean impossible = true;
+//								for(int cell1Value : cell1.getPossibleValues()){
+//									if(cell1Value+cell2Value==value) impossible = false;
+//								}
+//								if(impossible) impossibleValues.add(cell2Value);
+//							}
+//							cell2.getPossibleValues().removeAll(impossibleValues);
+//							if(impossibleValues.isEmpty()) break;
+//						}
+//						List<SudokuCell> cells = new ArrayList<>();
+//						cells.add(cell1);
+//						cells.add(cell2);
+//						String s = cell1.getLocation() + " and " + cell2.getLocation() + " must sum to " + value +"\nThis is because the cages within row(s) "+rowsUsed+" must sum to "
+//								+rowsUsed.size()*REGION_TOTAL+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal+"\nPossible values of these cells have been adjusted to fit this constraint";
+//						Reason r = new Reason(s,cells);
+//						CHECKED_SUM_CONSTRAINT.add(t);
+//						return r;
+//					}
+//				}
+//			}
 			if(totalLength==(numberOfRegions*SIZE+1)){
 				//find the extra cell
 				SudokuCell extraCell = null; 
@@ -286,10 +345,6 @@ public class KillerSudokuSolver {
 				extraCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
 				if(!extraCell.isSolved()){
 					solveCell(extraCell, value);
-					String rowsUsed="";
-					for(int k=0; k<numberOfRegions;k++){
-						rowsUsed+=(k+i);
-					}
 					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the row(s) "+rowsUsed+
 							"\nSince each row must total 45, the cages contained in "+numberOfRegions+" row(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in row(s) "+rowsUsed+" sum to "+cageTotal;
@@ -333,11 +388,6 @@ public class KillerSudokuSolver {
 				for(int r=0; r<numberOfRegions;r++){
 					subtractFromRow += SIZE*(i+r);
 				}
-				String rowsUsed="";
-				for(int k=0; k<numberOfRegions;k++){
-					rowsUsed+=(k+i);
-				}
-
 				rowNumber = subtractFromRow - rowNumber;
 				columnNumber = numberOfRegions*REGION_TOTAL - columnNumber;
 
@@ -356,8 +406,11 @@ public class KillerSudokuSolver {
 			//columns
 			cages = new HashSet<>();
 			List<SudokuCell> column = grid.getColumn(i);
+			Set<Integer> columnsUsed = new HashSet<>();
+			columnsUsed.add(i);
 			for(int j=0; j< numberOfRegions;j++){
 				column.addAll(grid.getColumn(j+i));
+				columnsUsed.add(j+i);
 			}
 			for(SudokuCell cell : column){
 				cages.add(grid.getCage(cell.getLocation()));
@@ -366,7 +419,59 @@ public class KillerSudokuSolver {
 			for(Cage c : cages){
 				totalLength += c.getLength();
 			}
-
+//			if(totalLength==(numberOfRegions*SIZE+2)){
+//				SudokuCell cell1 = null;
+//				SudokuCell cell2 = null;
+//				int cageTotal = 0;
+//				for(Cage c : cages){
+//					cageTotal += c.getTotal();
+//					for(Location l : c.getCellLocations()){
+//						if(!columnsUsed.contains(l.getColumn())){
+//							if(cell1==null && cell2==null){
+//								cell1=grid.getCell(l);
+//							}
+//							else{
+//								cell2=grid.getCell(l);
+//							}
+//						}
+//					}
+//				}
+//				int value = cageTotal - numberOfRegions*REGION_TOTAL;
+//				Triple<SudokuCell, SudokuCell, Integer> triple = new Triple<>(cell1, cell2, value);
+//				if(!CHECKED_SUM_CONSTRAINT.contains(triple)){
+//					if(!cell1.isSolved() || !cell2.isSolved()){
+//						while(true){
+//							Set<Integer> impossibleValues = new TreeSet<>();
+//							for(int cell1Value : cell1.getPossibleValues()){
+//								boolean impossible = true;
+//								for(int cell2Value : cell2.getPossibleValues()){
+//									if(cell1Value+cell2Value==value) impossible = false;
+//								}
+//								if(impossible) impossibleValues.add(cell1Value);
+//							}
+//							cell1.getPossibleValues().removeAll(impossibleValues);
+//							impossibleValues.clear();
+//							for(int cell2Value : cell2.getPossibleValues()){
+//								boolean impossible = true;
+//								for(int cell1Value : cell1.getPossibleValues()){
+//									if(cell1Value+cell2Value==value) impossible = false;
+//								}
+//								if(impossible) impossibleValues.add(cell2Value);
+//							}
+//							cell2.getPossibleValues().removeAll(impossibleValues);
+//							if(impossibleValues.isEmpty()) break;
+//						}
+//						List<SudokuCell> cells = new ArrayList<>();
+//						cells.add(cell1);
+//						cells.add(cell2);
+//						String s = cell1.getLocation() + " and " + cell2.getLocation() + " must sum to " + value +"\nThis is because the cages within column(s) "+columnsUsed+" must sum to "
+//								+numberOfRegions*REGION_TOTAL+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal+"\nPossible values of these cells have been adjusted to fit this constraint";
+//						Reason r = new Reason(s,cells);
+//						CHECKED_SUM_CONSTRAINT.add(triple);
+//						return r;
+//					}
+//				}
+//			}
 			if(totalLength==(numberOfRegions*SIZE+1)){
 				//find the extra cell
 				SudokuCell extraCell = null; 
@@ -391,11 +496,6 @@ public class KillerSudokuSolver {
 				extraCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
 				if(!extraCell.isSolved()){
 					solveCell(extraCell, value);
-					String columnsUsed="";
-					for(int k=0; k<numberOfRegions;k++){
-						columnsUsed += (k+i);
-
-					}
 					String message = extraCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
 							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
@@ -446,11 +546,6 @@ public class KillerSudokuSolver {
 				missingCell = grid.getCell(Location.getInstance(rowNumber, columnNumber));
 				if(!missingCell.isSolved()){
 					solveCell(missingCell, value);
-					String columnsUsed="";
-					for(int k=0; k<numberOfRegions;k++){
-						columnsUsed += (k+i);
-					}
-
 					String message = missingCell.getLocation()+" has been solved using the extended rule of 45 on the column(s) "+columnsUsed+
 							"\nSince each column must total 45, the cages contained in "+numberOfRegions+" column(s) must sum to "+ numberOfRegions*REGION_TOTAL
 							+"\nThe cages in column(s) "+columnsUsed+" sum to "+cageTotal;
