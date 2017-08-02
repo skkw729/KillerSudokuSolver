@@ -50,6 +50,7 @@ public class SudokuCellUI extends JPanel {
 		return new Dimension(CELL_SIZE, CELL_SIZE);
 	}
 	private void init() {
+		super.setBackground(colour);
 		if(!cell.isSolved()){
 			for(int i=1;i<=SIZE;i++){
 				String s = ""+i;
@@ -71,10 +72,6 @@ public class SudokuCellUI extends JPanel {
 			this.add(l);
 		}
 		this.setBorder(COMPOUND_BORDER);
-	}
-	public void paintComponent(Graphics g){
-		super.paintComponent(g);
-		super.setBackground(colour);
 	}
 	public SudokuCell getCell(){
 		return cell;

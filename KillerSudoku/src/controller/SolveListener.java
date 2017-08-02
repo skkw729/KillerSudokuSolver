@@ -34,23 +34,26 @@ public class SolveListener implements ActionListener{
 			Reason reason = solver.solveCagesSpanningExtendedRegions();
 			if(reason != null){
 				String s = reason.getMessage();
-				gridUI.makeGrid();
+//				gridUI.makeGrid();
 				JOptionPane.showMessageDialog(null, s);
+				gridUI.makeGrid();
 
 			}
 			else{
 				reason = solver.solveAllAdjacentNonets();
 				if(reason!=null){
 						String s = reason.getMessage();
-						gridUI.makeGrid();
+//						gridUI.makeGrid();
 						JOptionPane.showMessageDialog(null, s);
+						gridUI.makeGrid();
 				}
 				else{
 					reason = solver.solveSingleValueCells();
 					if(reason != null){
 						String s = reason.getMessage();
-						gridUI.makeGrid();
+//						gridUI.makeGrid();
 						JOptionPane.showMessageDialog(null, s);
+						gridUI.makeGrid();
 
 					}
 					else {
@@ -68,15 +71,16 @@ public class SolveListener implements ActionListener{
 								textArea.setLineWrap(true);
 								textArea.setWrapStyleWord(true);
 								scrollPane.setPreferredSize(new Dimension (500,500));
-								gridUI.makeGrid();
+//								gridUI.makeGrid();
 								JOptionPane.showMessageDialog(null,scrollPane);
-
+								gridUI.makeGrid();
 							}
 							else{
 								reason = solver.setSinglePositionCombinationAllCages();
 								if(reason!=null) {
-									gridUI.makeGrid();
+//									gridUI.makeGrid();
 									JOptionPane.showMessageDialog(null, reason.getMessage());
+									gridUI.makeGrid();
 								}
 								else{
 									running = false;
