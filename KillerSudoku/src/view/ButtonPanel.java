@@ -34,7 +34,6 @@ public class ButtonPanel extends JPanel{
 		panel.add(solveOneStepB);
 		panel.setBorder(BorderFactory.createEmptyBorder(150, 0, 0, 0));
 		help = new JCheckBox("Help");
-		help.setSelected(true);
 		panel.add(help);
 		
 	}

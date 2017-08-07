@@ -18,6 +18,7 @@ public class HelpCheckBoxListener implements ItemListener {
 			for(SudokuCellUI cellUI: gridUI.getListUI()){
 				if(!cellUI.getCell().isSolved()) cellUI.setBlank();
 			}
+			gridUI.rePaint();
 		}
 		else if(e.getStateChange()==ItemEvent.SELECTED){
 			gridUI.makeGrid();

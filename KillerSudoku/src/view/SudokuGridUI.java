@@ -90,6 +90,10 @@ public class SudokuGridUI {
 			gridPanel.add(nonetPanel);
 		}
 	}
+	public void rePaint(){
+		frame.validate();
+		frame.repaint();
+	}
 	public void makeGrid() {
 		contentPanel.remove(gridPanel);
 		gridPanel = new JPanel();

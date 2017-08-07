@@ -29,9 +29,9 @@ public class SolveOnceListener implements ActionListener{
 		gridUI.makeGrid();
 		solver.setPossibleValuesForCages();
 		solver.solveSingleValueCells();
-			Reason reason = solver.solveCagesSpanningExtendedRegions();
-			if(reason != null){
-				if(buttonPanel.getHelpCheckBox().isSelected()){
+		Reason reason = solver.solveCagesSpanningExtendedRegions();
+		if(reason != null){
+			if(buttonPanel.getHelpCheckBox().isSelected()){
 				String s = reason.getMessage();
 				JTextArea textArea = new JTextArea(s);
 				JScrollPane scrollPane = new JScrollPane(textArea);
@@ -39,42 +39,42 @@ public class SolveOnceListener implements ActionListener{
 				textArea.setWrapStyleWord(true);
 				scrollPane.setPreferredSize(new Dimension (200,150));
 				JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+			}
+			gridUI.makeGrid();
+
+		}
+		else{
+			reason = solver.solveAllAdjacentNonets();
+			if(reason!=null){
+				if(buttonPanel.getHelpCheckBox().isSelected()){
+					String s = reason.getMessage();
+					JTextArea textArea = new JTextArea(s);
+					JScrollPane scrollPane = new JScrollPane(textArea);
+					textArea.setLineWrap(true);
+					textArea.setWrapStyleWord(true);
+					scrollPane.setPreferredSize(new Dimension (200,150));
+					JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 				}
 				gridUI.makeGrid();
-
 			}
 			else{
-				reason = solver.solveAllAdjacentNonets();
-				if(reason!=null){
+				reason = solver.solveSingleValueCells();
+				if(reason != null){
 					if(buttonPanel.getHelpCheckBox().isSelected()){
 						String s = reason.getMessage();
-						JTextArea textArea = new JTextArea(s);
-						JScrollPane scrollPane = new JScrollPane(textArea);
-						textArea.setLineWrap(true);
-						textArea.setWrapStyleWord(true);
-						scrollPane.setPreferredSize(new Dimension (200,150));
-						JOptionPane.showMessageDialog(buttonPanel,scrollPane);
-					}
-						gridUI.makeGrid();
-				}
-				else{
-					reason = solver.solveSingleValueCells();
-					if(reason != null){
-						if(buttonPanel.getHelpCheckBox().isSelected()){
-						String s = reason.getMessage();
-//						gridUI.makeGrid();
+						//						gridUI.makeGrid();
 						JOptionPane.showMessageDialog(buttonPanel, s);
-						}
-						gridUI.makeGrid();
-
 					}
-					else {
-						solver.setPossibleCombinationsForCages();
-						if(!solver.setPossibleCombinationsForCages().isEmpty())gridUI.makeGrid();
-						else{
-							List<Reason> reasons = solver.removeUniqueCageSumsFromRegions();
-							if(!reasons.isEmpty()){
-								if(buttonPanel.getHelpCheckBox().isSelected()){
+					gridUI.makeGrid();
+
+				}
+				else {
+					solver.setPossibleCombinationsForCages();
+					if(!solver.setPossibleCombinationsForCages().isEmpty())gridUI.makeGrid();
+					else{
+						List<Reason> reasons = solver.removeUniqueCageSumsFromRegions();
+						if(!reasons.isEmpty()){
+							if(buttonPanel.getHelpCheckBox().isSelected()){
 								String s = "";
 								for(Reason r : reasons){
 									s += r.getMessage();
@@ -84,30 +84,30 @@ public class SolveOnceListener implements ActionListener{
 								textArea.setLineWrap(true);
 								textArea.setWrapStyleWord(true);
 								scrollPane.setPreferredSize(new Dimension (200,150));
-//								gridUI.makeGrid();
+								//								gridUI.makeGrid();
 								JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+							}
+							gridUI.makeGrid();
+						}
+						else{
+							reason = solver.setSinglePositionCombinationAllCages();
+							if(reason!=null) {
+								if(buttonPanel.getHelpCheckBox().isSelected()){
+									JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
 								}
 								gridUI.makeGrid();
 							}
 							else{
-								reason = solver.setSinglePositionCombinationAllCages();
-								if(reason!=null) {
-									if(buttonPanel.getHelpCheckBox().isSelected()){
-									JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
-									}
-									gridUI.makeGrid();
-								}
-								else{
-									JOptionPane.showMessageDialog(buttonPanel, "This program is unable to solve any further");
-								}
+								JOptionPane.showMessageDialog(buttonPanel, "This program is unable to solve any further");
 							}
 						}
-
 					}
+
 				}
 			}
+		}
 		if(solver.isSolved()) JOptionPane.showMessageDialog(buttonPanel, "This puzzle has been solved!");
-		
+
 	}
 
 }

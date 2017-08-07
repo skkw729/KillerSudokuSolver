@@ -81,7 +81,5 @@ public class SudokuCellUI extends JPanel {
 	}
 	public void setBlank(){
 		this.removeAll();
-		this.revalidate();
-		this.repaint();
 	}
 }
