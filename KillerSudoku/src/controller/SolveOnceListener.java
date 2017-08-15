@@ -3,6 +3,7 @@ package controller;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -12,6 +13,7 @@ import javax.swing.JTextArea;
 import model.KillerSudokuSolver;
 import model.Reason;
 import view.ButtonPanel;
+import view.SudokuCellUI;
 import view.SudokuGridUI;
 
 public class SolveOnceListener implements ActionListener{
@@ -25,27 +27,25 @@ public class SolveOnceListener implements ActionListener{
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		boolean helpOn = buttonPanel.getHelpCheckBox().isSelected();
 		solver.setPossibleCombinationsForCages();
-		gridUI.makeGrid();
 		solver.setPossibleValuesForCages();
-		solver.solveSingleValueCells();
-		Reason reason = solver.solveCagesSpanningExtendedRegions();
+		if(helpOn){
+			gridUI.makeGrid();
+		}
+		Reason reason = solver.solveSingleValueCells();
 		if(reason != null){
 			if(buttonPanel.getHelpCheckBox().isSelected()){
 				String s = reason.getMessage();
-				JTextArea textArea = new JTextArea(s);
-				JScrollPane scrollPane = new JScrollPane(textArea);
-				textArea.setLineWrap(true);
-				textArea.setWrapStyleWord(true);
-				scrollPane.setPreferredSize(new Dimension (200,150));
-				JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+				JOptionPane.showMessageDialog(buttonPanel, s);
 			}
 			gridUI.makeGrid();
 
 		}
 		else{
-			reason = solver.solveAllAdjacentNonets();
-			if(reason!=null){
+			reason = solver.solveCagesSpanningExtendedRegions();
+			if(reason != null){
+
 				if(buttonPanel.getHelpCheckBox().isSelected()){
 					String s = reason.getMessage();
 					JTextArea textArea = new JTextArea(s);
@@ -58,15 +58,18 @@ public class SolveOnceListener implements ActionListener{
 				gridUI.makeGrid();
 			}
 			else{
-				reason = solver.solveSingleValueCells();
-				if(reason != null){
+				reason = solver.solveAllAdjacentNonets();
+				if(reason!=null){
 					if(buttonPanel.getHelpCheckBox().isSelected()){
 						String s = reason.getMessage();
-						//						gridUI.makeGrid();
-						JOptionPane.showMessageDialog(buttonPanel, s);
+						JTextArea textArea = new JTextArea(s);
+						JScrollPane scrollPane = new JScrollPane(textArea);
+						textArea.setLineWrap(true);
+						textArea.setWrapStyleWord(true);
+						scrollPane.setPreferredSize(new Dimension (200,150));
+						JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 					}
 					gridUI.makeGrid();
-
 				}
 				else {
 					solver.setPossibleCombinationsForCages();
@@ -97,9 +100,6 @@ public class SolveOnceListener implements ActionListener{
 								}
 								gridUI.makeGrid();
 							}
-							else{
-								JOptionPane.showMessageDialog(buttonPanel, "This program is unable to solve any further");
-							}
 						}
 					}
 
@@ -107,7 +107,14 @@ public class SolveOnceListener implements ActionListener{
 			}
 		}
 		if(solver.isSolved()) JOptionPane.showMessageDialog(buttonPanel, "This puzzle has been solved!");
-
+		if(!helpOn){
+			List<SudokuCellUI> solvedCells = new ArrayList<>();
+			for(SudokuCellUI cellUI : gridUI.getListUI()){
+				if(cellUI.getCell().isSolved()) solvedCells.add(cellUI);
+			}
+			for(SudokuCellUI cellUI : gridUI.getListUI()){
+				if(!solvedCells.contains(cellUI))cellUI.setBlank();
+			}
+		}
 	}
-
 }

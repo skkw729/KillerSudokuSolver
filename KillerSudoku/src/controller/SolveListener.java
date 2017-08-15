@@ -30,28 +30,25 @@ public class SolveListener implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		solver.setPossibleCombinationsForCages();
-		gridUI.makeGrid();
 		solver.setPossibleValuesForCages();
-		solver.solveSingleValueCells();
+		if(buttonPanel.getHelpCheckBox().isSelected()){
+			gridUI.makeGrid();
+		}
 		boolean running = true;
 		while(!solver.isSolved() && running){
-			Reason reason = solver.solveCagesSpanningExtendedRegions();
+			Reason reason = solver.solveSingleValueCells();
 			if(reason != null){
 				if(buttonPanel.getHelpCheckBox().isSelected()){
-				String s = reason.getMessage();
-				JTextArea textArea = new JTextArea(s);
-				JScrollPane scrollPane = new JScrollPane(textArea);
-				textArea.setLineWrap(true);
-				textArea.setWrapStyleWord(true);
-				scrollPane.setPreferredSize(new Dimension (200,150));
-				JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+					String s = reason.getMessage();
+					JOptionPane.showMessageDialog(buttonPanel, s);
 				}
 				gridUI.makeGrid();
 
 			}
 			else{
-				reason = solver.solveAllAdjacentNonets();
-				if(reason!=null){
+				reason = solver.solveCagesSpanningExtendedRegions();
+				if(reason != null){
+
 					if(buttonPanel.getHelpCheckBox().isSelected()){
 						String s = reason.getMessage();
 						JTextArea textArea = new JTextArea(s);
@@ -61,18 +58,21 @@ public class SolveListener implements ActionListener{
 						scrollPane.setPreferredSize(new Dimension (200,150));
 						JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 					}
-						gridUI.makeGrid();
+					gridUI.makeGrid();
 				}
 				else{
-					reason = solver.solveSingleValueCells();
-					if(reason != null){
+					reason = solver.solveAllAdjacentNonets();
+					if(reason!=null){
 						if(buttonPanel.getHelpCheckBox().isSelected()){
-						String s = reason.getMessage();
-//						gridUI.makeGrid();
-						JOptionPane.showMessageDialog(buttonPanel, s);
+							String s = reason.getMessage();
+							JTextArea textArea = new JTextArea(s);
+							JScrollPane scrollPane = new JScrollPane(textArea);
+							textArea.setLineWrap(true);
+							textArea.setWrapStyleWord(true);
+							scrollPane.setPreferredSize(new Dimension (200,150));
+							JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 						}
 						gridUI.makeGrid();
-
 					}
 					else {
 						solver.setPossibleCombinationsForCages();
@@ -81,17 +81,16 @@ public class SolveListener implements ActionListener{
 							reasons = solver.removeUniqueCageSumsFromRegions();
 							if(!reasons.isEmpty()){
 								if(buttonPanel.getHelpCheckBox().isSelected()){
-								String s = "";
-								for(Reason r : reasons){
-									s += r.getMessage();
-								}
-								JTextArea textArea = new JTextArea(s);
-								JScrollPane scrollPane = new JScrollPane(textArea);
-								textArea.setLineWrap(true);
-								textArea.setWrapStyleWord(true);
-								scrollPane.setPreferredSize(new Dimension (200,150));
-//								gridUI.makeGrid();
-								JOptionPane.showMessageDialog(buttonPanel,scrollPane);
+									String s = "";
+									for(Reason r : reasons){
+										s += r.getMessage();
+									}
+									JTextArea textArea = new JTextArea(s);
+									JScrollPane scrollPane = new JScrollPane(textArea);
+									textArea.setLineWrap(true);
+									textArea.setWrapStyleWord(true);
+									scrollPane.setPreferredSize(new Dimension (200,150));
+									JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 								}
 								gridUI.makeGrid();
 							}
@@ -99,7 +98,7 @@ public class SolveListener implements ActionListener{
 								reason = solver.setSinglePositionCombinationAllCages();
 								if(reason!=null) {
 									if(buttonPanel.getHelpCheckBox().isSelected()){
-									JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
+										JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
 									}
 									gridUI.makeGrid();
 								}

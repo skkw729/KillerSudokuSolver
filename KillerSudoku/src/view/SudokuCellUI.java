@@ -19,7 +19,7 @@ public class SudokuCellUI extends JPanel {
 	private static final int SIZE = 9;
 	private static final int CELL_SIZE = 70;
 	private static final Font SOLVED_FONT = new Font("SansSerif", Font.BOLD, 30);
-	private static final Font TOTAL_FONT = new Font("Serif", Font.BOLD + Font.ITALIC, 15);
+	private static final Font TOTAL_FONT = new Font("Serif", Font.BOLD + Font.ITALIC, 14);
 	private static final Font UNSOLVED_FONT = new Font("SansSerif", Font.PLAIN, 12);
 	private static Border COMPOUND_BORDER = BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.black), BorderFactory.createEmptyBorder(18,0,0,0));
 	private static Border BORDER = BorderFactory.createLineBorder(Color.black);

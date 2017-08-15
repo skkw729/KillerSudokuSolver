@@ -23,24 +23,26 @@ public class LoadFileListener implements ActionListener {
 	}
 	public void actionPerformed(ActionEvent e){
 		JFileChooser chooser = new JFileChooser();
-	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "Text files", "txt");
-	    chooser.setFileFilter(filter);
-	    int returnVal = chooser.showOpenDialog(null);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	    	File file = chooser.getSelectedFile();
-	    	try {
-	    		KillerSudokuGrid grid = CageParser.getKillerSudokuGrid(file);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				"Text files", "txt");
+		chooser.setFileFilter(filter);
+		int returnVal = chooser.showOpenDialog(null);
+		if(returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			try {
+				KillerSudokuGrid grid = CageParser.getKillerSudokuGrid(file);
 				gridUI.changeGrid(grid);
 				solver.changeGrid(grid);
-				for(SudokuCellUI cellUI : gridUI.getListUI()){
-					cellUI.setBlank();
+				if(!gridUI.getButtonPanel().getHelpCheckBox().isSelected()){
+					for(SudokuCellUI cellUI : gridUI.getListUI()){
+						cellUI.setBlank();
+					}
 				}
-	    	}
-				catch (FileNotFoundException e1) {
+			}
+			catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-	    }
+		}
 	}
 }
