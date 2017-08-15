@@ -15,7 +15,6 @@ public class KillerSudokuSolver {
 	private KillerSudokuGrid grid;
 	private static final int SIZE = 9;
 	private boolean solved;
-	private SudokuSolver sudokuSolver;
 	private static List<Pair<Cage, Region>> CHECKED_CAGE_REGIONS = new ArrayList<>();
 	private static Map<Integer, List<Integer>> ADJACENT_NONETS = new HashMap<>();
 	private static List<Triple<SudokuCell, SudokuCell,Integer>> CHECKED_SUM_CONSTRAINT = new ArrayList<>();
@@ -23,7 +22,6 @@ public class KillerSudokuSolver {
 
 	public KillerSudokuSolver(KillerSudokuGrid grid) {
 		this.grid = grid;
-		sudokuSolver = new SudokuSolver(grid);
 		assignAdjacentNonets();
 		solved = false;
 	}
@@ -31,7 +29,6 @@ public class KillerSudokuSolver {
 		this.grid = grid;
 		solved = false;
 		CHECKED_CAGE_REGIONS = new ArrayList<>();
-		sudokuSolver = new SudokuSolver(grid);
 	}
 	public KillerSudokuGrid getGrid() {
 		return grid;
@@ -234,9 +231,6 @@ public class KillerSudokuSolver {
 		}
 		return null;
 
-	}
-	public SudokuSolver getSudokuSolver() {
-		return sudokuSolver;
 	}
 	public Reason solveCagesSpanningExtendedRegions(){
 		for(int i=1;i<=8;i++){
@@ -847,7 +841,7 @@ public class KillerSudokuSolver {
 		List<Combination> combinations = Sums.getSums(cage.getLength(), cage.getTotal(), cagePossibleNumbers);
 		Combination combination = combinations.get(0);
 		Set<Integer> numbers = combination.getNumbers();
-		sudokuSolver.removeFromRegion(numbers, grid.getCells(cage), region);
+		removeFromRegion(numbers, grid.getCells(cage), region);
 		CHECKED_CAGE_REGIONS.add(cageRegion);
 		Reason reason = new Reason("The "+cage.getTotal()+ " cage located at "+cage.getCellLocations().get(0)+" has only one possible combination and is fully contained within "+region
 				+"\nThis means that this combination cannot appear in "+region+" therefore "+numbers +" has been removed from the possible values of cells in "+region+"\n\n");
@@ -922,7 +916,16 @@ public class KillerSudokuSolver {
 		return possibleValues;
 	}
 	public List<SudokuCell> getSingleValueCellList(){
-		return sudokuSolver.getSingleValueCellList();
+		List<SudokuCell> cellsList = new ArrayList<>();
+		SudokuCell[][] cell = grid.getGrid();
+		for(int i=0;i<SIZE;i++){
+			for(int j=0;j<SIZE;j++){
+				if(cell[i][j].hasSinglePossibleValue() && !cell[i][j].isSolved()){
+					cellsList.add(cell[i][j]);
+				}
+			}
+		}
+		return cellsList;
 	}
 	public Reason solveSingleValueCell(SudokuCell cell){
 		if(cell.hasSinglePossibleValue()){
@@ -935,10 +938,111 @@ public class KillerSudokuSolver {
 	}
 
 	public void removeFromAllRegions(SudokuCell cell) {
-		sudokuSolver.removeFromAllZones(cell);
+		removeSolvedValueFromRow(cell);
+		removeSolvedValueFromColumn(cell);
+		removeSolvedValueFromNonet(cell);
 	}
+	//
+	public void removeFromRegion(Set<Integer> value, List<SudokuCell> cellsToIgnore, Region region){
+		for(int i : value){
+			if(region.getRegion().equals(Type.Row)){
+				removeFromRow(cellsToIgnore, i);
+			}
+			else if(region.getRegion().equals(Type.Column)){
+				removeFromColumn(cellsToIgnore, i);
+			}
+			else if(region.getRegion().equals(Type.Nonet)){
+				removeFromNonet(cellsToIgnore, i);
+			}
+		}
+	}
+	
+	private void removeSolvedValueFromRow(SudokuCell cell){
+		int value = cell.getValue();
+		removeFromRow(cell, value);
+	}
+	private void removeFromRow(SudokuCell cell, int value) {
+		Location location = cell.getLocation();
+		int row = location.getRow();
+		List<SudokuCell> cells = grid.getRow(row);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
+		}
+	}
+	private void removeFromRow(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int row = location.getRow();
+		List<SudokuCell> cellRow = grid.getRow(row);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellRow.get(i)) && !cellRow.get(i).isSolved()) cellRow.get(i).setImpossibleValue(value);
+		}
+	}
+	private void removeSolvedValueFromColumn(SudokuCell cell){
+		int value = cell.getValue();
+		removeFromColumn(cell, value);
+	}
+	private void removeFromColumn(SudokuCell cell, int value) {
+		Location location = cell.getLocation();
+		int column = location.getColumn();
+		List<SudokuCell> cells = grid.getColumn(column);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
+		}
+	}
+	private void removeFromColumn(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int column = location.getColumn();
+		List<SudokuCell> cellColumn = grid.getColumn(column);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellColumn.get(i)) && !cellColumn.get(i).isSolved()) cellColumn.get(i).setImpossibleValue(value);
+		}
+	}
+	private void removeSolvedValueFromNonet(SudokuCell cell){
+		int value = cell.getValue();
+		removeFromNonet(cell, value);
+	}
+	private void removeFromNonet(SudokuCell cell, int value) {
+		Location location = cell.getLocation();
+		int nonet = location.getNonet();
+		List<SudokuCell> cells = grid.getNonet(nonet);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.get(i).equals(cell) && !cells.get(i).isSolved()) cells.get(i).setImpossibleValue(value);
+		}
+	}
+	private void removeFromNonet(List<SudokuCell> cells, int value) {
+		Location location = cells.get(0).getLocation();
+		int nonet = location.getNonet();
+		List<SudokuCell> cellNonet = grid.getNonet(nonet);
+		for(int i=0;i<SIZE;i++){
+			if(!cells.contains(cellNonet.get(i)) && !cellNonet.get(i).isSolved()) cellNonet.get(i).setImpossibleValue(value);
+		}
+	}
+	
+	//
 	public boolean isValidAtLocation(int value, Location location){
-		return sudokuSolver.isValidAtLocation(value, location);
+		int row = location.getRow();
+		int column = location.getColumn();
+		int nonet = location.getNonet();
+		List<SudokuCell> cells = grid.getRow(row);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		cells = grid.getColumn(column);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		cells = grid.getNonet(nonet);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	private void solveCell(SudokuCell cell, int value){
 		Cage cage = grid.getCage(cell.getLocation());
