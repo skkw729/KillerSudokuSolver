@@ -1,4 +1,6 @@
-package model;
+package test;
+
+import model.Sums;
 
 public class SumsTest{
 	public static void main(String[] args){

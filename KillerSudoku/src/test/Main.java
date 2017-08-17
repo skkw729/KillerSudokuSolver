@@ -1,6 +1,10 @@
-package model;
+package test;
 import java.io.FileNotFoundException;
 import java.util.List;
+
+import model.Cage;
+import model.CageParser;
+import model.KillerSudokuGrid;
 
 public class Main {
 
