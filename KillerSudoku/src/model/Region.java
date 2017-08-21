@@ -15,6 +15,7 @@ public class Region {
 		Region r = REGIONS.get(s);
 		if(r==null){
 			r = new Region(type, number);
+			REGIONS.put(s, r);
 			return r;
 		}
 		return r;
@@ -33,11 +34,5 @@ public class Region {
 	}
 	public String toString(){
 		return region+" "+number;
-	}
-	public boolean equals(Object obj){
-		if(this==obj) return true;
-		if(!(obj instanceof Region)) return false;
-		Region r = (Region) obj;
-		return (r.getNumber()==this.getNumber() && r.getRegion().equals(this.getRegion()));
 	}
 }

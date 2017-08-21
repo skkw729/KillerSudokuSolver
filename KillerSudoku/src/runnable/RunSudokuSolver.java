@@ -1,4 +1,4 @@
-package test;
+package runnable;
 import model.*;
 import view.*;
 
@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import controller.*;
-public class SudokuSolverTest implements Runnable {
+public class RunSudokuSolver implements Runnable {
 	
 		
 	@Override
@@ -34,6 +34,6 @@ public class SudokuSolverTest implements Runnable {
 
 	}
 	public static void main(String[] args){
-		SwingUtilities.invokeLater(new SudokuSolverTest());
+		SwingUtilities.invokeLater(new RunSudokuSolver());
 	}
 }

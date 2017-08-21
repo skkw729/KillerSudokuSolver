@@ -957,6 +957,32 @@ public class KillerSudokuSolver {
 		}
 	}
 	
+	//
+	public boolean isValidAtLocation(int value, Location location){
+		int row = location.getRow();
+		int column = location.getColumn();
+		int nonet = location.getNonet();
+		List<SudokuCell> cells = grid.getRow(row);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		cells = grid.getColumn(column);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		cells = grid.getNonet(nonet);
+		for(int i=0;i<cells.size();i++){
+			if(cells.get(i).getValue()==value){
+				return false;
+			}
+		}
+		
+		return true;
+	}
 	private void removeSolvedValueFromRow(SudokuCell cell){
 		int value = cell.getValue();
 		removeFromRow(cell, value);
@@ -1018,32 +1044,6 @@ public class KillerSudokuSolver {
 		}
 	}
 	
-	//
-	public boolean isValidAtLocation(int value, Location location){
-		int row = location.getRow();
-		int column = location.getColumn();
-		int nonet = location.getNonet();
-		List<SudokuCell> cells = grid.getRow(row);
-		for(int i=0;i<cells.size();i++){
-			if(cells.get(i).getValue()==value){
-				return false;
-			}
-		}
-		cells = grid.getColumn(column);
-		for(int i=0;i<cells.size();i++){
-			if(cells.get(i).getValue()==value){
-				return false;
-			}
-		}
-		cells = grid.getNonet(nonet);
-		for(int i=0;i<cells.size();i++){
-			if(cells.get(i).getValue()==value){
-				return false;
-			}
-		}
-		
-		return true;
-	}
 	private void solveCell(SudokuCell cell, int value){
 		Cage cage = grid.getCage(cell.getLocation());
 		cell.setValue(value);
