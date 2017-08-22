@@ -28,6 +28,7 @@ public class SolveOnceListener implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		boolean helpOn = buttonPanel.getHelpCheckBox().isSelected();
+		boolean strategyUsed = false;
 		solver.setPossibleCombinationsForCages();
 		solver.setPossibleValuesForCages();
 		if(helpOn){
@@ -39,6 +40,7 @@ public class SolveOnceListener implements ActionListener{
 				String s = reason.getMessage();
 				JOptionPane.showMessageDialog(buttonPanel, s);
 			}
+			strategyUsed = true;
 			gridUI.makeGrid();
 
 		}
@@ -55,6 +57,7 @@ public class SolveOnceListener implements ActionListener{
 					scrollPane.setPreferredSize(new Dimension (200,150));
 					JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 				}
+				strategyUsed = true;
 				gridUI.makeGrid();
 			}
 			else{
@@ -69,6 +72,7 @@ public class SolveOnceListener implements ActionListener{
 						scrollPane.setPreferredSize(new Dimension (200,150));
 						JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 					}
+					strategyUsed = true;
 					gridUI.makeGrid();
 				}
 				else {
@@ -90,6 +94,7 @@ public class SolveOnceListener implements ActionListener{
 								//								gridUI.makeGrid();
 								JOptionPane.showMessageDialog(buttonPanel,scrollPane);
 							}
+							strategyUsed = true;
 							gridUI.makeGrid();
 						}
 						else{
@@ -98,6 +103,7 @@ public class SolveOnceListener implements ActionListener{
 								if(buttonPanel.getHelpCheckBox().isSelected()){
 									JOptionPane.showMessageDialog(buttonPanel, reason.getMessage());
 								}
+								strategyUsed = true;
 								gridUI.makeGrid();
 							}
 						}
@@ -106,7 +112,6 @@ public class SolveOnceListener implements ActionListener{
 				}
 			}
 		}
-		if(solver.isSolved()) JOptionPane.showMessageDialog(buttonPanel, "This puzzle has been solved!");
 		if(!helpOn){
 			List<SudokuCellUI> solvedCells = new ArrayList<>();
 			for(SudokuCellUI cellUI : gridUI.getListUI()){
@@ -116,5 +121,7 @@ public class SolveOnceListener implements ActionListener{
 				if(!solvedCells.contains(cellUI))cellUI.setBlank();
 			}
 		}
+		if(solver.isSolved()) JOptionPane.showMessageDialog(buttonPanel, "This puzzle has been solved!");
+		else if(!strategyUsed) JOptionPane.showMessageDialog(buttonPanel, "This program is unable to solve any further");
 	}
 }
